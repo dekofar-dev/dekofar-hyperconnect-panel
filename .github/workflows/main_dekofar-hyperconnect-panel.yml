@@ -1,4 +1,4 @@
-name: Build and Deploy Angular to Azure
+name: Build and deploy Angular app to Azure Web App - dekofar-hyperconnect-panel
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '20.x'
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
@@ -31,4 +31,4 @@ jobs:
           app-name: 'dekofar-hyperconnect-panel'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: ./dist/dekofar-hyperconnect-panel
+          package: ./dist/demo3
