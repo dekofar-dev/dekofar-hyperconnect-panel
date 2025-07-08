@@ -25,11 +25,13 @@ jobs:
       - name: Angular projesini production için derle
         run: npm run build -- --configuration production
 
-      - name: Build çıktısını zip’le (düz içerik zipleniyor)
+      - name: Temiz dağıtım klasörünü hazırla
         run: |
-          cd dist
-          zip -r ../../release.zip ./*
-          cd ../..
+          rm -rf deploy release.zip
+          mkdir deploy
+          cp -r dist/* deploy/
+          cd deploy
+          zip -r ../release.zip .
 
       - name: Azure Web App'e yükle (Zip Deploy)
         uses: azure/webapps-deploy@v3
