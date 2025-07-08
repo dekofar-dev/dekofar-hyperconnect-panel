@@ -25,10 +25,15 @@ jobs:
       - name: Build Angular app
         run: npm run build -- --configuration production
 
+      - name: Zip build output
+        run: |
+          cd dist/demo3
+          zip -r ../../release.zip .
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'dekofar-hyperconnect-panel'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: ./dist/demo3
+          package: ./release.zip
