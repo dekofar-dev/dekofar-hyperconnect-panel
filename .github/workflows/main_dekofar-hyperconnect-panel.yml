@@ -27,7 +27,7 @@ jobs:
 
       - name: Build çıktısını zip’le (düz içerik zipleniyor)
         run: |
-          cd dist/demo3
+          cd dist
           zip -r ../../release.zip ./*
           cd ../..
 
