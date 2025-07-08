@@ -1,4 +1,4 @@
-name: Build and deploy Angular app to Azure Web App
+name: Build and deploy Angular app to Azure Web App - dekofar-hyperconnect-panel
 
 on:
   push:
@@ -11,29 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Kodu GitHub'dan çek
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Node.js kur
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      - name: Angular bağımlılıklarını yükle ve build et
-        run: |
-          npm install --legacy-peer-deps
-          npm run build -- --configuration production
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
 
-      - name: Build çıktısını zip’le
-        run: |
-          cd dist
-          project_folder=$(ls -d */ | head -n 1 | cut -f1 -d'/')
-          zip -r ../release.zip "$project_folder"
-          cd ..
+      - name: Build Angular app
+        run: npm run build -- --configuration production
 
-      - name: Azure Web App'e yükle (Zip Deploy)
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'dekofar-hyperconnect-panel'
+          slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: release.zip
+          package: ./dist/demo3
