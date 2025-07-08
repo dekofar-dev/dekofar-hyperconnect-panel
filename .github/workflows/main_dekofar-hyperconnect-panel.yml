@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Kodu GitHub'dan çek
+      - name: Kodları GitHub'dan çek
         uses: actions/checkout@v4
 
       - name: Node.js ortamını kur
@@ -25,12 +25,11 @@ jobs:
       - name: Angular projesini production için derle
         run: npm run build -- --configuration production
 
-      - name: Build çıktısını zip’le
+      - name: Build çıktısını zip’le (düz içerik zipleniyor)
         run: |
-          cd dist
-          project_folder=$(ls -d */ | head -n 1 | cut -f1 -d'/')
-          zip -r ../release.zip "$project_folder"
-          cd ..
+          cd dist/demo3
+          zip -r ../../release.zip ./*
+          cd ../..
 
       - name: Azure Web App'e yükle (Zip Deploy)
         uses: azure/webapps-deploy@v3
