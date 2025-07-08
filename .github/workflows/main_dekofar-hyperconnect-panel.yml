@@ -22,13 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Build Angular app
+      - name: Build Angular app (production)
         run: npm run build -- --configuration production
 
-      - name: Zip build output (dist klasörünün İÇERİĞİ)
+      - name: Zip build output
         run: |
           cd dist
           zip -r ../release.zip .
+          cd ..
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
