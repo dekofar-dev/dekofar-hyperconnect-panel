@@ -19,19 +19,19 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Bağımlılıkları yükle ve Angular projesini production için build et
+      - name: Angular bağımlılıklarını yükle ve build et
         run: |
           npm install --legacy-peer-deps
-          npm run build -- --configuration=production
+          npm run build -- --configuration production
 
-      - name: Build klasörünü zip’le
+      - name: Build çıktısını zip’le
         run: |
           cd dist
           project_folder=$(ls -d */ | head -n 1 | cut -f1 -d'/')
           zip -r ../release.zip "$project_folder"
           cd ..
 
-      - name: Zip dosyasını deploy et (Azure App Service)
+      - name: Azure Web App'e yükle (Zip Deploy)
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'dekofar-hyperconnect-panel'
