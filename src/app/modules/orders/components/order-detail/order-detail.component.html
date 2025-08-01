@@ -135,12 +135,12 @@
 
         <!-- Sipariş Notu -->
         <div class="card mb-5">
-          <div class="card-header">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">Sipariş Notu</h5>
+            <button class="btn btn-sm btn-light" (click)="saveNote()">Kaydet</button>
           </div>
           <div class="card-body">
-            {{ order.note || 'Not bulunmuyor' }}
-            <hr />
+            <textarea class="form-control" rows="3" [(ngModel)]="updatedNote"></textarea>
           </div>
         </div>
 
@@ -198,16 +198,10 @@
         <div class="card mb-5">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">Etiketler</h5>
-            <button class="btn btn-sm btn-light">Kaydet</button>
+            <button class="btn btn-sm btn-light" (click)="saveTags()">Kaydet</button>
           </div>
           <div class="card-body">
-            <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Etiket ekle..." />
-            </div>
-            <div>
-              <span class="badge badge-light-success me-2">İade</span>
-              <span class="badge badge-light-info me-2">Yeni</span>
-            </div>
+            <input type="text" class="form-control" [(ngModel)]="updatedTags" placeholder="Virgülle ayırın" />
           </div>
         </div>
 

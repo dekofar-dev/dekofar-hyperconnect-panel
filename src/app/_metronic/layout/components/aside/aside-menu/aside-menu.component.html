@@ -25,7 +25,9 @@
   <div class="menu-sub menu-sub-accordion">
     <div class="menu-item">
       <a class="menu-link" routerLink="/support-tickets" routerLinkActive="active">
-        <span class="menu-title">Tüm Talepler</span>
+        <span class="menu-title">
+          {{ userRole === 'Admin' ? 'Tüm Talepler' : 'Taleplerim' }}
+        </span>
       </a>
     </div>
     <div class="menu-item">

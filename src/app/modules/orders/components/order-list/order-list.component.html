@@ -30,18 +30,20 @@
         <!--begin::Card toolbar-->
         <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
           <div class="w-100 mw-150px">
-            <select class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-placeholder="Durum">
-              <option>Tümü</option>
-              <option value="Cancelled">İptal Edildi</option>
-              <option value="Completed">Tamamlandı</option>
-              <option value="Denied">Reddedildi</option>
-              <option value="Expired">Süresi Doldu</option>
-              <option value="Failed">Başarısız</option>
-              <option value="Pending">Beklemede</option>
-              <option value="Processing">İşleniyor</option>
-              <option value="Refunded">İade Edildi</option>
-              <option value="Delivered">Teslim Edildi</option>
-              <option value="Delivering">Teslim Ediliyor</option>
+            <select class="form-select form-select-solid" [(ngModel)]="paymentFilter">
+              <option value="">Ödeme Durumu</option>
+              <option value="paid">Ödendi</option>
+              <option value="pending">Beklemede</option>
+              <option value="refunded">İade</option>
+              <option value="voided">İptal</option>
+            </select>
+          </div>
+          <div class="w-100 mw-150px">
+            <select class="form-select form-select-solid" [(ngModel)]="fulfillmentFilter">
+              <option value="">Gönderim Durumu</option>
+              <option value="fulfilled">Gönderildi</option>
+              <option value="unfulfilled">Beklemede</option>
+              <option value="cancelled">İptal</option>
             </select>
           </div>
           <a routerLink="/orders/create" class="btn btn-primary">Toplu Barkod Oluştur</a>
@@ -69,7 +71,7 @@
             </tr>
           </thead>
           <tbody class="fw-semibold text-gray-600">
-            <tr *ngFor="let order of searchResults || confirmedOrders" (click)="goToOrder(order.id)" style="cursor: pointer;" class="hover-bg-light">
+            <tr *ngFor="let order of filteredOrders" (click)="goToOrder(order.id)" style="cursor: pointer;" class="hover-bg-light">
               <td class="text-start">
                 <div class="form-check form-check-sm form-check-custom form-check-solid">
                   <input class="form-check-input" type="checkbox" />
