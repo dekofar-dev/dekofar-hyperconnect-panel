@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/modules/auth';
 import { SupportTicketService } from '../../services/support-ticket.service';
 import { SupportTicketDto } from '../../models/support-ticket.model';
 
@@ -26,13 +27,22 @@ export class TicketDetailComponent implements OnInit {
   selectedStatus: number | null = null;
   selectedPriority: number | null = null;
   noteText = '';
+  assignableUsers: { id: string; fullName: string }[] = [];
+  selectedUserId: string | null = null;
+  isAdmin = false;
+  isSupport = false;
 
   constructor(
     private route: ActivatedRoute,
-    private ticketService: SupportTicketService
+    private ticketService: SupportTicketService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
+    const current = this.auth.getAuthFromLocalStorage();
+    this.isAdmin = current?.role === 'Admin';
+    this.isSupport = current?.role === 'Support';
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -40,6 +50,12 @@ export class TicketDetailComponent implements OnInit {
         this.fetchTicketDetail();
       }
     });
+
+    if (this.isAdmin || this.isSupport) {
+      this.ticketService.getAssignableUsers().subscribe(users => {
+        this.assignableUsers = users;
+      });
+    }
   }
 
   fetchTicketDetail(): void {
@@ -49,6 +65,7 @@ export class TicketDetailComponent implements OnInit {
         this.ticket = res;
         this.selectedStatus = res.status;
         this.selectedPriority = res.priority;
+        this.selectedUserId = res.assignedToUserId || null;
         this.loading = false;
       },
       error: (err) => {
@@ -123,7 +140,8 @@ export class TicketDetailComponent implements OnInit {
     if (!this.ticket) return;
     const data: any = {
       status: this.selectedStatus,
-      priority: this.selectedPriority
+      priority: this.selectedPriority,
+      assignedToUserId: this.selectedUserId
     };
     this.ticketService.update(this.ticket.id, data).subscribe({
       next: () => alert('Güncellendi'),
