@@ -8,6 +8,7 @@ import { DocumentsComponent } from './documents/documents.component';
 import { ProfileRoutingModule } from './profile-routing.module';
 import { ProfileComponent } from './profile.component';
 import { ConnectionsComponent } from './connections/connections.component';
+import { UserProfileComponent } from './overview/user-profile/user-profile.component';
 import {
   CardsModule,
   DropdownMenusModule,
@@ -23,6 +24,7 @@ import { SharedModule } from "../../_metronic/shared/shared.module";
     CampaignsComponent,
     DocumentsComponent,
     ConnectionsComponent,
+    UserProfileComponent,
   ],
   imports: [
     CommonModule,
