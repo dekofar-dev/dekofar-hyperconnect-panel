@@ -4,11 +4,27 @@ import { SupportTicketsComponent } from './support-tickets.component';
 import { TicketListComponent } from './components/ticket-list/ticket-list.component';
 import { TicketCreateComponent } from './components/ticket-create/ticket-create.component';
 import { TicketDetailComponent } from './components/ticket-detail/ticket-detail.component';
+import { RoleGuard } from '../auth/services/role.guard';
 
 const routes: Routes = [
-  { path: '', component: TicketListComponent },           // /support-tickets
-  { path: 'create', component: TicketCreateComponent },   // /support-tickets/create
-  { path: ':id', component: TicketDetailComponent },      // /support-tickets/:id
+  {
+    path: '',
+    component: TicketListComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['Support'] }
+  },           // /support-tickets
+  {
+    path: 'create',
+    component: TicketCreateComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['Support'] }
+  },   // /support-tickets/create
+  {
+    path: ':id',
+    component: TicketDetailComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['Support'] }
+  },      // /support-tickets/:id
   
 ];
 
