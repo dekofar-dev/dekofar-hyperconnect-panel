@@ -143,10 +143,15 @@ export class TicketCreateComponent implements OnInit {
     }
 
     this.ticketService.create(ticketData, this.attachedFiles).subscribe({
-      next: () => {
+      next: (created) => {
         this.loading = false;
         alert('✅ Destek talebi başarıyla oluşturuldu.');
-        this.router.navigate(['/support-tickets']);
+        const id = created.id;
+        if (id) {
+          this.router.navigate(['/support-tickets', id]);
+        } else {
+          this.router.navigate(['/support-tickets']);
+        }
       },
       error: (err) => {
         this.loading = false;
