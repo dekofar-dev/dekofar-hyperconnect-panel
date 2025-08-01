@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SupportTicketService } from '../../services/support-ticket.service';
+import { SupportTicketService, TicketQuery, PagedResult } from '../../services/support-ticket.service';
 import { SupportTicketDto } from '../../models/support-ticket.model';
 import { AuthService } from 'src/app/modules/auth';
 
@@ -11,6 +11,10 @@ export class TicketListComponent implements OnInit {
   tickets: SupportTicketDto[] = [];
   filteredTickets: SupportTicketDto[] = [];
   loading = true;
+  page = 1;
+  pageSize = 10;
+  hasMore = true;
+  searchText = '';
   selectedCategory: number | null = null;
   selectedStatus: number | null = null;
   selectedPriority: number | null = null;
@@ -21,29 +25,49 @@ export class TicketListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const currentUser = this.auth.getAuthFromLocalStorage();
-    const isAdmin = currentUser?.role === 'Admin';
-    const userId = currentUser?.id;
-    
-this.ticketService.getAll().subscribe({
-  next: (res) => {
-    const currentUser = this.auth.getAuthFromLocalStorage();
-    const isAdmin = currentUser?.role === 'Admin';
-    const userId = currentUser?.id;
-
-    this.tickets = isAdmin
-      ? res
-      : res.filter(t => t.assignedToUserId === userId); // sadece kendine atanmışları gör
-
-    this.filteredTickets = this.tickets;
-    this.loading = false;
-  },
-  error: (err) => {
-    console.error('Listeleme hatası:', err);
-    this.loading = false;
+    this.loadTickets(true);
   }
-});
 
+  loadTickets(reset: boolean = false): void {
+    if (reset) {
+      this.page = 1;
+      this.tickets = [];
+      this.hasMore = true;
+    }
+
+    if (!this.hasMore && !reset) {
+      return;
+    }
+
+    const query: TicketQuery = {
+      category: this.selectedCategory ?? undefined,
+      status: this.selectedStatus ?? undefined,
+      search: this.searchText || undefined,
+      page: this.page,
+      pageSize: this.pageSize
+    };
+
+    this.loading = true;
+    this.ticketService.list(query).subscribe({
+      next: (res: PagedResult<SupportTicketDto>) => {
+        const currentUser = this.auth.getAuthFromLocalStorage();
+        const isAdmin = currentUser?.role === 'Admin';
+        const userId = currentUser?.id;
+
+        const newItems = isAdmin ? res.items : res.items.filter(t => t.assignedToUserId === userId);
+        if (reset) {
+          this.tickets = newItems;
+        } else {
+          this.tickets = [...this.tickets, ...newItems];
+        }
+        this.filteredTickets = this.tickets;
+        this.hasMore = res.items.length === this.pageSize;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
   }
 
   // Atanan kişinin veya oluşturucunun baş harfleri
@@ -94,13 +118,9 @@ this.ticketService.getAll().subscribe({
     return tags ? tags.split(',').map(tag => tag.trim()) : [];
   }
 
-  // Kategoriye göre filtrele
+  // Filtreye göre yeniden yükle
   filterTickets(): void {
-    this.filteredTickets = this.tickets.filter(t =>
-      (this.selectedCategory === null || t.category === this.selectedCategory) &&
-      (this.selectedStatus === null || t.status === this.selectedStatus) &&
-      (this.selectedPriority === null || t.priority === this.selectedPriority)
-    );
+    this.loadTickets(true);
   }
 
   filterByCategory(category: number | null): void {
@@ -116,5 +136,12 @@ this.ticketService.getAll().subscribe({
   onPriorityChange(priority: number | null): void {
     this.selectedPriority = priority;
     this.filterTickets();
+  }
+
+  loadMore(): void {
+    if (this.hasMore && !this.loading) {
+      this.page++;
+      this.loadTickets();
+    }
   }
 }

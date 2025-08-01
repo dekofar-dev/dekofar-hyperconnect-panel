@@ -128,6 +128,13 @@
             <option *ngFor="let p of priorityOptions" [ngValue]="p.id">{{ p.label }}</option>
           </select>
         </div>
+        <div class="col-md-6 mt-3" *ngIf="assignUsers.length">
+          <label class="form-label">Atanan Kullanıcı</label>
+          <select class="form-select" [(ngModel)]="selectedUser">
+            <option [ngValue]="null">Seçiniz</option>
+            <option *ngFor="let u of assignUsers" [ngValue]="u.id">{{ u.fullName }}</option>
+          </select>
+        </div>
       </div>
       <button class="btn btn-sm btn-primary" (click)="updateTicket()">Kaydet</button>
     </div>

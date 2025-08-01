@@ -34,6 +34,10 @@
       <option [ngValue]="2">Orta</option>
       <option [ngValue]="3">Düşük</option>
     </select>
+
+    <div class="ms-auto">
+      <input type="text" class="form-control form-control-sm" placeholder="Ara" [(ngModel)]="searchText" (ngModelChange)="filterTickets()" />
+    </div>
   </div>
 
   <!-- Kart listesi -->
@@ -104,5 +108,10 @@
   <!-- Boş liste -->
   <div *ngIf="!loading && filteredTickets.length === 0" class="text-center text-muted mt-5">
     Seçilen kategoriye ait destek talebi bulunmamaktadır.
+  </div>
+
+  <!-- Daha fazla yükle -->
+  <div class="text-center mt-4" *ngIf="hasMore && !loading">
+    <button class="btn btn-primary" (click)="loadMore()">Daha Fazla</button>
   </div>
 </div>

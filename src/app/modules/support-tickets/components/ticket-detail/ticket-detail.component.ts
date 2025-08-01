@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SupportTicketService } from '../../services/support-ticket.service';
 import { SupportTicketDto } from '../../models/support-ticket.model';
+import { AuthService } from 'src/app/modules/auth';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -12,6 +13,8 @@ export class TicketDetailComponent implements OnInit {
   ticket?: SupportTicketDto;
   loading = true;
   errorMessage: string | null = null;
+  assignUsers: { id: string; fullName: string }[] = [];
+  selectedUser: string | null = null;
   statusOptions = [
     { id: 0, label: 'Açık' },
     { id: 1, label: 'İnceleme' },
@@ -29,7 +32,8 @@ export class TicketDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private ticketService: SupportTicketService
+    private ticketService: SupportTicketService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +44,12 @@ export class TicketDetailComponent implements OnInit {
         this.fetchTicketDetail();
       }
     });
+    const user = this.auth.getAuthFromLocalStorage();
+    if (user?.role === 'Admin' || user?.role === 'Support') {
+      this.ticketService.getAssignableUsers().subscribe(users => {
+        this.assignUsers = users;
+      });
+    }
   }
 
   fetchTicketDetail(): void {
@@ -49,6 +59,7 @@ export class TicketDetailComponent implements OnInit {
         this.ticket = res;
         this.selectedStatus = res.status;
         this.selectedPriority = res.priority;
+        this.selectedUser = res.assignedToUserId || null;
         this.loading = false;
       },
       error: (err) => {
@@ -126,7 +137,13 @@ export class TicketDetailComponent implements OnInit {
       priority: this.selectedPriority
     };
     this.ticketService.update(this.ticket.id, data).subscribe({
-      next: () => alert('Güncellendi'),
+      next: () => {
+        if (this.selectedUser) {
+          this.ticketService.assignUser(this.ticket!.id, this.selectedUser).subscribe(() => {});
+        }
+        alert('Güncellendi');
+        this.fetchTicketDetail();
+      },
       error: () => alert('Güncellenemedi')
     });
   }

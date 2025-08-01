@@ -1,8 +1,23 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { SupportTicketCreateDto, SupportTicketDto } from '../models/support-ticket.model';
+
+export interface TicketQuery {
+  category?: number;
+  status?: number;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +27,26 @@ export class SupportTicketService {
 
   constructor(private http: HttpClient) {}
 
-  // 🟢 Tüm destek taleplerini getir
-  getAll(): Observable<SupportTicketDto[]> {
-    return this.http.get<SupportTicketDto[]>(this.baseUrl);
+  // 🟢 Destek taleplerini listele (filtre + sayfalı)
+  list(query: TicketQuery = {}): Observable<PagedResult<SupportTicketDto>> {
+    let params = new HttpParams();
+    if (query.category !== undefined && query.category !== null) {
+      params = params.set('category', query.category);
+    }
+    if (query.status !== undefined && query.status !== null) {
+      params = params.set('status', query.status);
+    }
+    if (query.search) {
+      params = params.set('search', query.search);
+    }
+    if (query.page) {
+      params = params.set('page', query.page);
+    }
+    if (query.pageSize) {
+      params = params.set('pageSize', query.pageSize);
+    }
+
+    return this.http.get<PagedResult<SupportTicketDto>>(this.baseUrl, { params });
   }
 
   // 🟢 Belirli talebi getir
@@ -23,7 +55,7 @@ export class SupportTicketService {
   }
 
   // 🟢 Yeni destek talebi oluştur
-  create(data: SupportTicketCreateDto, files: File[] = []): Observable<void> {
+  create(data: SupportTicketCreateDto, files: File[] = []): Observable<SupportTicketDto> {
     const formData = new FormData();
 
     // Form alanlarını forma ekle
@@ -38,7 +70,7 @@ export class SupportTicketService {
       formData.append('attachments', file);
     });
 
-    return this.http.post<void>(this.baseUrl, formData);
+    return this.http.post<SupportTicketDto>(this.baseUrl, formData);
   }
 
   // 🟢 Talebe kullanıcı ata
