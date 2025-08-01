@@ -1,8 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { SupportTicketCreateDto, SupportTicketDto } from '../models/support-ticket.model';
+import { PagedResult } from '../models/paged-result.model';
+import { SupportTicketQuery } from '../models/support-ticket-query.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +14,15 @@ export class SupportTicketService {
 
   constructor(private http: HttpClient) {}
 
-  // 🟢 Tüm destek taleplerini getir
-  getAll(): Observable<SupportTicketDto[]> {
-    return this.http.get<SupportTicketDto[]>(this.baseUrl);
+  // 🟢 Destek taleplerini filtre ve sayfalama ile getir
+  list(query: SupportTicketQuery): Observable<PagedResult<SupportTicketDto>> {
+    let params = new HttpParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value as any);
+      }
+    });
+    return this.http.get<PagedResult<SupportTicketDto>>(this.baseUrl, { params });
   }
 
   // 🟢 Belirli talebi getir
@@ -23,7 +31,7 @@ export class SupportTicketService {
   }
 
   // 🟢 Yeni destek talebi oluştur
-  create(data: SupportTicketCreateDto, files: File[] = []): Observable<void> {
+  create(data: SupportTicketCreateDto, files: File[] = []): Observable<SupportTicketDto> {
     const formData = new FormData();
 
     // Form alanlarını forma ekle
@@ -38,7 +46,7 @@ export class SupportTicketService {
       formData.append('attachments', file);
     });
 
-    return this.http.post<void>(this.baseUrl, formData);
+    return this.http.post<SupportTicketDto>(this.baseUrl, formData);
   }
 
   // 🟢 Talebe kullanıcı ata
@@ -63,8 +71,8 @@ export class SupportTicketService {
   }
 
   // 🟢 Talep güncelle (durum, öncelik, kategori vb.)
-  update(ticketId: number, data: any): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${ticketId}`, data);
+  update(ticketId: number, data: any): Observable<SupportTicketDto> {
+    return this.http.put<SupportTicketDto>(`${this.baseUrl}/${ticketId}`, data);
   }
 
   // 🔄 Atanabilir kullanıcıları getir (detay ekranı için opsiyonel)

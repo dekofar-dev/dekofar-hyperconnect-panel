@@ -1,0 +1,25 @@
+<div class="card">
+  <div class="card-body d-flex align-items-center">
+    <div class="symbol symbol-120px me-5 flex-shrink-0">
+      <img *ngIf="user?.pic" [src]="user.pic" alt="avatar" class="h-120px w-120px rounded-circle" />
+      <div *ngIf="!user?.pic" class="symbol-label fs-2 fw-bold text-white bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+        {{ initials }}
+      </div>
+    </div>
+    <div>
+      <h3 class="fw-bolder mb-1">{{ user?.fullName }}</h3>
+      <div *ngIf="user?.role" class="mb-3">
+        <span class="badge badge-light-primary">{{ user?.role }}</span>
+      </div>
+      <div class="text-gray-600" *ngIf="user?.email">
+        <i class="bi bi-envelope me-2"></i>{{ user.email }}
+      </div>
+      <div class="text-gray-600" *ngIf="(user as any)?.phone">
+        <i class="bi bi-telephone me-2"></i>{{ (user as any).phone }}
+      </div>
+      <div class="text-gray-600" *ngIf="(user as any)?.address">
+        <i class="bi bi-geo-alt me-2"></i>{{ (user as any).address }}
+      </div>
+    </div>
+  </div>
+</div>
