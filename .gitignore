@@ -17,9 +17,7 @@
 # Mac
 .DS_Store
 
-# Environment files
-src/environments/*.ts
-!src/environments/environment.prod.ts
+
 
 # Logs
 npm-debug.log*
