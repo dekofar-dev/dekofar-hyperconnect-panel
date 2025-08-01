@@ -1,0 +1,139 @@
+<div class="row">
+  <!-- Sol: Talep Formu -->
+  <div [ngClass]="orderSummary ? 'col-lg-8 mb-4' : 'col-12 mb-4'">
+    <div class="card shadow-sm w-100">
+      <div class="card-body">
+        <h5 class="card-title mb-4">🎫 Yeni Destek Talebi Oluştur</h5>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" enctype="multipart/form-data">
+          <!-- Talep Kodu -->
+          <div class="mb-3">
+            <label class="form-label">Talep Kodu</label><br />
+            <span class="badge bg-light-primary text-dark px-3 py-2 fs-6">
+              {{ ticketCode || 'Oluşturulacak' }}
+            </span>
+          </div>
+
+          <!-- Konu -->
+          <div class="mb-3">
+            <label class="form-label">Konu</label>
+            <input type="text" formControlName="subject" class="form-control" />
+          </div>
+
+          <!-- Kategori -->
+          <div class="mb-3">
+            <label class="form-label">Kategori</label>
+            <select formControlName="category" class="form-select">
+              <option [ngValue]="null" disabled selected>Seçiniz</option>
+              <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.label }}</option>
+            </select>
+          </div>
+
+          <!-- Açıklama -->
+          <div class="mb-3">
+            <label class="form-label">Açıklama</label>
+            <textarea formControlName="description" rows="5" class="form-control"></textarea>
+          </div>
+
+          <!-- Öncelik -->
+          <div class="mb-3">
+            <label class="form-label">Öncelik</label>
+            <select formControlName="priority" class="form-select">
+              <option [ngValue]="null" disabled selected>Seçiniz</option>
+              <option *ngFor="let prio of priorityOptions" [value]="prio.id">
+                {{ prio.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Etiketler -->
+          <div class="mb-3">
+            <label class="form-label">Etiketler</label>
+            <input type="text" formControlName="tags" class="form-control" placeholder="Örn: iade, acil" />
+            <small class="text-muted">Etiketleri virgül ile ayırabilirsiniz</small>
+          </div>
+
+          <!-- Shopify değilse müşteri bilgileri -->
+          <ng-container *ngIf="!isShopifyReference">
+            <!-- Müşteri Adı -->
+            <div class="mb-3">
+              <label class="form-label">Müşteri Adı</label>
+              <input type="text" formControlName="customerName" class="form-control" placeholder="Ad Soyad" />
+            </div>
+
+            <!-- Müşteri Telefonu -->
+            <div class="mb-3">
+              <label class="form-label">Telefon</label>
+              <input type="text" formControlName="customerPhone" class="form-control" placeholder="5XXXXXXXXX" />
+            </div>
+
+            <!-- Müşteri E-Posta -->
+            <div class="mb-3">
+              <label class="form-label">E-posta</label>
+              <input type="email" formControlName="customerEmail" class="form-control" placeholder="musteri@site.com" />
+            </div>
+          </ng-container>
+
+          <!-- Dosya Ekleme -->
+          <div class="mb-3">
+            <label class="form-label">Dosya Ekle (Opsiyonel)</label>
+            <input type="file" class="form-control" (change)="onFileSelected($event)" multiple />
+            <small class="text-muted">PDF, JPG, PNG gibi belgeler yükleyebilirsiniz</small>
+          </div>
+
+          <!-- Eklenen Dosyalar -->
+          <div *ngIf="attachedFiles.length > 0" class="mb-3">
+            <label class="form-label fw-semibold">Eklenen Dosyalar:</label>
+            <ul class="list-group">
+              <li *ngFor="let file of attachedFiles" class="list-group-item">{{ file.name }}</li>
+            </ul>
+          </div>
+
+          <!-- Gönder Butonu -->
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid || loading">
+              <span *ngIf="!loading">📨 Talebi Gönder</span>
+              <span *ngIf="loading">⏳ Gönderiliyor...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sağ: Sipariş Özeti -->
+  <div class="col-lg-4 mb-4" *ngIf="orderSummary">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-light fw-bold text-dark">📦 Sipariş Özeti</div>
+      <div class="card-body text-start">
+        <div class="text-center mb-3">
+          <img
+            [src]="orderSummary.imageUrl || 'https://via.placeholder.com/100'"
+            alt="Ürün"
+            class="rounded"
+            style="width: 100px; height: 100px; object-fit: cover;"
+          />
+        </div>
+        <div class="mb-2"><strong>📦 Sipariş No:</strong> #{{ orderSummary.orderNumber }}</div>
+        <div class="mb-2"><strong>🛍️ Ürün:</strong> {{ orderSummary.productTitle }}</div>
+        <div class="mb-2"><strong>🔢 Adet:</strong> {{ orderSummary.quantity || 1 }}</div>
+        <div class="mb-2"><strong>💰 Tutar:</strong> {{ orderSummary.totalPrice }}</div>
+        <div class="mb-2"><strong>👤 Müşteri:</strong> {{ orderSummary.customerName }}</div>
+        <div class="mb-2"><strong>📍 Adres:</strong> {{ orderSummary.address || '-' }}</div>
+        <div><strong>🚚 Kargo Durumu:</strong> {{ orderSummary.shippingStatus || 'Hazırlanıyor' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hata Modalı -->
+<app-modal
+  #errorModal
+  [modalConfig]="modalConfig"
+  (onDismiss)="errorModal.close()"
+  (onClose)="showFullError()"
+>
+  <p class="text-danger fw-bold">
+    İşlem sırasında bir hata oluştu. Detayları görmek için "Detay Göster"e tıklayın.
+  </p>
+</app-modal>

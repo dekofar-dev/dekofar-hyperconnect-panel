@@ -1,0 +1,261 @@
+<!-- Dashboard -->
+<div class="menu-item">
+  <a
+    class="menu-link without-sub"
+    routerLink="/dashboard"
+    routerLinkActive="active"
+    ><span class="menu-icon">
+      <span
+        [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"
+        class="svg-icon svg-icon-2"
+      ></span>
+    </span>
+    <span class="menu-title" translate="MENU.DASHBOARD"></span
+  ></a>
+</div>
+<!-- Destek Talepleri -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/communication/com003.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Destek Talepleri</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item">
+      <a class="menu-link" routerLink="/support-tickets" routerLinkActive="active">
+        <span class="menu-title">Tüm Talepler</span>
+      </a>
+    </div>
+    <div class="menu-item">
+      <a class="menu-link" routerLink="/support-tickets/create" routerLinkActive="active">
+        <span class="menu-title">Yeni Talep Oluştur</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Siparişler -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/ecommerce/ecm001.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Siparişler</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <!-- Tüm Siparişler -->
+    <div class="menu-item">
+      <a class="menu-link" routerLink="/orders" routerLinkActive="active">
+        <span class="menu-title">Tüm Siparişler</span>
+      </a>
+    </div>
+
+    <!-- Shopify Siparişleri -->
+    <div class="menu-item">
+      <a
+        class="menu-link"
+        [routerLink]="['/orders']"
+        [queryParams]="{ source: 'shopify' }"
+        routerLinkActive="active"
+      >
+        <span class="menu-title">Shopify Siparişleri</span>
+      </a>
+    </div>
+
+    <!-- Manuel Siparişler -->
+    <div class="menu-item">
+      <a
+        class="menu-link"
+        [routerLink]="['/orders']"
+        [queryParams]="{ source: 'manual' }"
+        routerLinkActive="active"
+      >
+        <span class="menu-title">Manuel Siparişler</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- Kargo İşlemleri -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/general/gen019.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Kargo İşlemleri</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item"><a class="menu-link" routerLink="/shipping/create-shipment" routerLinkActive="active"><span class="menu-title">Gönderi Hazırla</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/shipping/track-code-entry" routerLinkActive="active"><span class="menu-title">Takip Kodu Girişi</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/shipping/delivery-issues" routerLinkActive="active"><span class="menu-title">Sorunlu Kargolar</span></a></div>
+  </div>
+</div>
+
+<!-- Müşteri Hizmetleri -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/communication/com012.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Müşteri Hizmetleri</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item"><a class="menu-link" routerLink="/support/pending-support" routerLinkActive="active"><span class="menu-title">Destek Bekleyenler</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/support/undelivered" routerLinkActive="active"><span class="menu-title">Teslim Edilemeyenler</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/support/return-requests" routerLinkActive="active"><span class="menu-title">İade Talepleri</span></a></div>
+  </div>
+</div>
+
+<!-- İadeler -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/files/fil002.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">İadeler</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item"><a class="menu-link" routerLink="/returns/pending" routerLinkActive="active"><span class="menu-title">Onay Bekleyen</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/returns/approved" routerLinkActive="active"><span class="menu-title">Kabul Edilen</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/returns/rejected" routerLinkActive="active"><span class="menu-title">Reddedilen</span></a></div>
+  </div>
+</div>
+
+<!-- Finans -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/finance/fin006.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Finans</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item"><a class="menu-link" routerLink="/finance/cod-payments" routerLinkActive="active"><span class="menu-title">Kapıda Tahsilat</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/finance/shipping-invoices" routerLinkActive="active"><span class="menu-title">Kargo Faturaları</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/finance/expenses" routerLinkActive="active"><span class="menu-title">Giderler</span></a></div>
+  </div>
+</div>
+
+<!-- Envanter -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/ecommerce/ecm008.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Envanter</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item"><a class="menu-link" routerLink="/inventory/product-list" routerLinkActive="active"><span class="menu-title">Ürün Listesi</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/inventory/stock-tracking" routerLinkActive="active"><span class="menu-title">Stok Takibi</span></a></div>
+  </div>
+</div>
+
+<!-- Gelen Kutusu -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/communication/com006.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Gelen Kutusu</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item"><a class="menu-link" routerLink="/mailbox/inbox" routerLinkActive="active"><span class="menu-title">Gelen Kutusu</span></a></div>
+    <div class="menu-item"><a class="menu-link" routerLink="/mailbox/pending-replies" routerLinkActive="active"><span class="menu-title">Yanıt Bekleyenler</span></a></div>
+  </div>
+</div>
+
+<!-- Metronic'e ait menüler yorum satırına alındı -->
+<!--
+<div class="menu-item">
+  <a class="menu-link without-sub" routerLink="/builder" routerLinkActive="active">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Layout Builder</span>
+  </a>
+</div>
+
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span class="svg-icon svg-icon-2" [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"></span>
+    </span>
+    <span class="menu-title">Pages</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+    ...
+  </div>
+</div>
+
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span class="svg-icon svg-icon-2" [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"></span>
+    </span>
+    <span class="menu-title">Accounts</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+    ...
+  </div>
+</div>
+
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span class="svg-icon svg-icon-2" [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"></span>
+    </span>
+    <span class="menu-title">Errors</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+    ...
+  </div>
+</div>
+
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span class="svg-icon svg-icon-2" [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"></span>
+    </span>
+    <span class="menu-title">Widgets</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+    ...
+  </div>
+</div>
+
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span class="svg-icon svg-icon-2" [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"></span>
+    </span>
+    <span class="menu-title">Chat</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+    ...
+  </div>
+</div>
+
+<div class="menu-item">
+  <a target="_blank" class="menu-link" [href]="appPreviewChangelogUrl">
+    <span class="menu-icon">
+      <span class="svg-icon svg-icon-2" [inlineSVG]="'./assets/media/icons/duotune/arrows/arr001.svg'"></span>
+    </span>
+    <span class="menu-title">Changelog {{ appAngularVersion }}</span>
+  </a>
+</div>
+-->

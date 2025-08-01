@@ -1,0 +1,54 @@
+# Angular build outputs
+/dist/
+/out-tsc/
+/.angular/
+
+# Node modules
+/node_modules/
+
+# IDE configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Mac
+.DS_Store
+
+# Environment files
+src/environments/*.ts
+!src/environments/environment.prod.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage
+/coverage/
+
+# NPM pack output
+*.tgz
+
+# TypeScript outputs
+*.js
+*.js.map
+*.d.ts
+
+# ESLint
+.eslintcache
+
+# Misc
+/.sass-cache
+/connect.lock
+.npm/
+Thumbs.db
+ehthumbs.db
+local.db
+*.local.json
+
+# Package locks (isteğe bağlı dışarıda bırakılabilir)
+package-lock.json

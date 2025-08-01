@@ -1,0 +1,124 @@
+<div class="container-xxl py-5" *ngIf="!loading && ticket">
+
+  <!-- Başlık -->
+  <div class="mb-5">
+    <h3 class="fw-bold">
+      🎫 Destek Talebi Detayı - <span class="text-primary">{{ ticket.ticketNumber }}</span>
+    </h3>
+    <p class="text-muted">
+      Oluşturulma: {{ ticket.createdAt | date:'short' }}
+      <br />
+      <span class="badge bg-info text-dark mt-2">
+        {{ ticket.shopifyOrderId ? 'Shopify Siparişi Referanslı' : 'Manuel Talep' }}
+      </span>
+    </p>
+  </div>
+
+  <!-- Temel Bilgiler -->
+  <div class="row mb-5">
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">📌 Konu:</div>
+      <div>{{ ticket.subject }}</div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">📂 Kategori:</div>
+      <div>{{ getCategoryName(ticket.category) }}</div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">🚦 Öncelik:</div>
+      <div>{{ getPriorityLabel(ticket.priority) }}</div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">📌 Durum:</div>
+      <div>{{ getStatusLabel(ticket.status) }}</div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">📞 Telefon:</div>
+      <div>{{ ticket.customerPhone || '-' }}</div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">📧 E-posta:</div>
+      <div>{{ ticket.customerEmail || '-' }}</div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">🛒 Shopify Sipariş ID:</div>
+      <div>{{ ticket.shopifyOrderId || '-' }}</div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="fw-semibold">🏷️ Etiketler:</div>
+      <div>{{ ticket.tags || '-' }}</div>
+    </div>
+
+    <div class="col-md-6 mb-3" *ngIf="ticket.dueDate">
+      <div class="fw-semibold">⏳ Son Yanıtlama Tarihi (SLA):</div>
+      <div>{{ ticket.dueDate | date:'shortDate' }}</div>
+    </div>
+  </div>
+
+  <!-- Açıklama -->
+  <div class="mb-5">
+    <div class="fw-semibold">📝 Açıklama:</div>
+    <div class="border rounded p-3 bg-light">{{ ticket.description }}</div>
+  </div>
+
+  <!-- Dosya Eklentileri -->
+  <div class="mb-5" *ngIf="hasAttachments()">
+    <h5 class="fw-bold mb-3">📎 Eklentiler</h5>
+    <ul class="list-group">
+      <li *ngFor="let file of ticket.attachments" class="list-group-item">
+        <a [href]="file.url" target="_blank">{{ file.fileName }}</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Notlar -->
+  <div class="mb-5" *ngIf="hasNotes()">
+    <h5 class="fw-bold mb-3">📓 Notlar</h5>
+    <div class="border rounded bg-white">
+      <div *ngFor="let note of ticket.notes" class="border-bottom p-3">
+        <div class="fw-semibold">{{ note.createdBy }}</div>
+        <div class="text-muted small">{{ note.createdAt | date:'short' }}</div>
+        <div class="mt-2">{{ note.message }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- İşlem Geçmişi -->
+  <div class="mb-5" *ngIf="hasLogs()">
+    <h5 class="fw-bold mb-3">📜 İşlem Geçmişi</h5>
+    <ul class="list-group">
+      <li *ngFor="let log of ticket.logs" class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <div class="fw-semibold">{{ log.action }}</div>
+          <div class="text-muted small">👤 {{ log.createdBy }} — {{ log.createdAt | date:'short' }}</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Durum Geçmişi -->
+  <div *ngIf="hasHistory()">
+    <h5 class="fw-bold mb-3">🕓 Durum Geçmişi</h5>
+    <ul class="list-group">
+      <li *ngFor="let h of ticket.history" class="list-group-item">
+        {{ getStatusLabel(h.status) }} → {{ h.changedBy }} → {{ h.changedAt | date:'short' }}
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Yükleniyor -->
+<div class="text-center py-5" *ngIf="loading">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Yükleniyor...</span>
+  </div>
+</div>
+
+<!-- Hata -->
+<div class="alert alert-danger" *ngIf="!loading && !ticket">
+  Destek talebi bulunamadı.
+</div>

@@ -1,0 +1,227 @@
+<div class="container-fluid py-6">
+  <div class="row w-100 mb-5 mb-xl-12 py-6 min-vh-75" *ngIf="order">
+    
+    <!-- Başlık ve Geçiş -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-6">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <h2 class="fw-bold text-gray-800 mb-0">#{{ order.orderNumber }}</h2>
+        <span class="badge"
+              [ngClass]="order?.financialStatus === 'paid' ? 'badge-success' : 'badge-warning'">
+          🚚 {{ order.fulfillmentStatus === 'fulfilled' ? 'Gönderildi' : 'Gönderilmedi' }}
+        </span>
+        <span class="badge"
+              [ngClass]="order.financialStatus === 'paid' ? 'bg-purple text-white' : 'bg-danger text-white'">
+          💳 {{
+            order.financialStatus === 'paid' ? 'Ödendi' :
+            order.financialStatus === 'pending' ? 'Ödeme Bekleniyor' :
+            'Durum Yok'
+          }}
+        </span>
+        <span class="text-muted">Oluşturulma: {{ order.createdAt | date:'d MMMM y, HH:mm':'':'tr-TR' }}</span>
+      </div>
+      <div class="d-flex align-items-center gap-2" *ngIf="order">
+        <button class="btn btn-icon btn-light-primary" [disabled]="!hasPreviousOrder" (click)="goToPreviousOrder()">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="btn btn-icon btn-light-primary" [disabled]="!hasNextOrder" (click)="goToNextOrder()">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8">
+        
+        <!-- Gönderim Kartı -->
+        <div class="card mb-5">
+          <div class="card-body d-flex">
+            <div class="me-4">
+              <img [src]="order.lineItems[0]?.imageUrl || defaultImage" class="w-50px h-50px" alt="" />
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ order.lineItems[0]?.title }}</div>
+              <div class="text-muted">{{ order.lineItems[0]?.variantTitle || 'Standart' }}</div>
+              <div class="text-muted">{{ order.lineItems[0]?.quantity }} x {{ order.totalPrice }} {{ order.currency }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ödeme Durumu -->
+        <div class="card mb-5">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <div>
+                <span class="badge badge-light-warning">
+                  ⚠️ Kapıda Ödeme (COD)
+                  <span class="badge text-white ms-2"
+                        [ngStyle]="{ 'background-color': order.financialStatus === 'paid' ? '#6f42c1' : '#dc3545' }">
+                    {{
+                      order.financialStatus === 'paid' ? 'Ödendi' :
+                      order.financialStatus === 'pending' ? 'Ödeme Bekleniyor' :
+                      'Durum Yok'
+                    }}
+                  </span>
+                </span>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-icon btn-light" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Arşivle</a></li>
+                </ul>
+              </div>
+            </div>
+            <p class="text-muted mt-2">Bu siparişin ödemesi işleniyor.</p>
+            <div class="mt-4">
+              <div class="d-flex justify-content-between mb-2"><span>Alt toplam</span><span>₺2.499,00</span></div>
+              <div class="d-flex justify-content-between mb-2"><span>Kargo</span><span>₺0,00</span></div>
+              <div class="d-flex justify-content-between fw-bold fs-6"><span>Toplam</span><span>₺2.499,00</span></div>
+              <div class="d-flex justify-content-between mt-2"><span>Ödenen</span><span>₺0,00</span></div>
+              <div class="d-flex justify-content-between"><span>Bakiye</span><span>₺2.499,00</span></div>
+              <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-sm btn-light">Fatura Gönder</button>
+                <button class="btn btn-sm btn-light-success">Ödendi olarak işaretle</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Yorum Alanı -->
+        <div class="card mb-5">
+          <div class="card-body">
+            <div class="d-flex align-items-start">
+              <div class="symbol symbol-40px me-4">
+                <span class="symbol-label bg-light-info text-info fw-bold">RA</span>
+              </div>
+              <div class="flex-grow-1">
+                <textarea class="form-control form-control-solid" rows="3" placeholder="Yorum yazın..."></textarea>
+                <div class="text-end mt-2">
+                  <button class="btn btn-sm btn-light-primary">Gönder</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- İşlem Geçmişi -->
+        <div class="card mb-5">
+          <div class="card-header">
+            <h5 class="card-title">İşlem Geçmişi</h5>
+          </div>
+          <div class="card-body">
+            <ul class="timeline">
+              <li class="timeline-item d-flex">
+                <span class="timeline-icon bg-primary me-4"></span>
+                <div>
+                  <div class="fw-semibold">Sipariş oluşturuldu</div>
+                  <div class="text-muted fs-7">30 Temmuz 2025, 09:45</div>
+                </div>
+              </li>
+              <li class="timeline-item d-flex">
+                <span class="timeline-icon bg-success me-4"></span>
+                <div>
+                  <div class="fw-semibold">Kargoya verildi</div>
+                  <div class="text-muted fs-7">31 Temmuz 2025, 14:10</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div> <!-- /col-lg-8 -->
+      <!-- Sağ Alan -->
+      <div class="col-lg-4">
+
+        <!-- Sipariş Notu -->
+        <div class="card mb-5">
+          <div class="card-header">
+            <h5 class="card-title">Sipariş Notu</h5>
+          </div>
+          <div class="card-body">
+            {{ order.note || 'Not bulunmuyor' }}
+            <hr />
+          </div>
+        </div>
+
+        <!-- 👤 Müşteri Kartı -->
+        <div class="card mb-5 shadow-sm border-0" style="border-radius: 0.75rem;">
+          <div class="card-header border-0 bg-light px-4 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title fw-bold mb-0">👤 Müşteri</h5>
+              <span class="badge fw-semibold rounded-pill"
+                    [ngStyle]="{
+                      'background-color': customerType === 'elite' ? '#0f9d58' :
+                                         customerType === 'problematic' ? '#ffc107' : '#dee2e6',
+                      'color': customerType === 'standard' ? '#212529' : '#fff'
+                    }">
+                {{
+                  customerType === 'elite' ? '🏅 VIP' :
+                  customerType === 'problematic' ? '⚠️ Sorunlu' : '👤 Standart'
+                }}
+              </span>
+            </div>
+          </div>
+          <div class="card-body px-4 pt-3 pb-4">
+            <div class="mb-2">
+              <i class="bi bi-person-fill me-2 text-muted"></i>
+              {{ order.customer?.firstName || '-' }} {{ order.customer?.lastName || '' }}
+            </div>
+            <div class="mb-2">
+              <i class="bi bi-telephone-fill me-2 text-muted"></i>
+              {{ order.customer?.phone || order.billingAddress?.phone || 'Telefon yok' }}
+            </div>
+            <div class="mb-2">
+              <i class="bi bi-envelope-fill me-2 text-muted"></i>
+              {{ order.customer?.email || 'Email yok' }}
+            </div>
+            <hr />
+            <div class="mb-2">
+              <i class="bi bi-geo-alt-fill me-2 text-muted"></i>
+              {{ order.billingAddress?.address1 || '-' }}
+            </div>
+            <div class="mb-2">
+              <i class="bi bi-map-fill me-2 text-muted"></i>
+              {{ order.billingAddress?.zip || '' }} {{ order.billingAddress?.city || '' }}, {{ order.billingAddress?.province || '' }}
+            </div>
+            <hr />
+            <div class="mb-2 text-muted small">
+              📦 <strong>Dönüşüm bilgisi:</strong> yok
+            </div>
+            <div class="text-muted small">
+              ⚠️ <strong>Risk analizi:</strong> yapılmadı
+            </div>
+          </div>
+        </div>
+
+        <!-- Etiketler -->
+        <div class="card mb-5">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title">Etiketler</h5>
+            <button class="btn btn-sm btn-light">Kaydet</button>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Etiket ekle..." />
+            </div>
+            <div>
+              <span class="badge badge-light-success me-2">İade</span>
+              <span class="badge badge-light-info me-2">Yeni</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🆘 Destek Talebi Butonu -->
+        <button
+          class="btn btn-lg fw-bold text-white w-100"
+          style="background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); border: none;"
+          (click)="onCreateSupportTicket()"
+        >
+          🆘 Destek Talebi Oluştur
+        </button>
+
+      </div> <!-- /col-lg-4 -->
+
+    </div> <!-- /row -->
+  </div> <!-- /card -->
+</div> <!-- /container-fluid -->

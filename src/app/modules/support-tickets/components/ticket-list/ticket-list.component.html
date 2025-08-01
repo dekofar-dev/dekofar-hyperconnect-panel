@@ -1,0 +1,95 @@
+<div class="container-fluid px-0">
+  <!-- Kategori filtre butonları -->
+  <div class="mb-4 d-flex flex-wrap gap-2">
+    <button class="btn btn-sm"
+            [ngClass]="{ 'btn-primary': selectedCategory === null, 'btn-light': selectedCategory !== null }"
+            (click)="filterByCategory(null)">
+      Tümü
+    </button>
+    <button *ngFor="let cat of [
+        { id: 1, name: 'İade' },
+        { id: 2, name: 'Değişim' },
+        { id: 3, name: 'Eksik Ürün' },
+        { id: 4, name: 'Kargo Sorunu' },
+        { id: 5, name: 'Garanti' },
+        { id: 6, name: 'Fatura' },
+        { id: 7, name: 'Arama Talebi' },
+        { id: 99, name: 'Diğer' }
+      ]"
+      class="btn btn-sm"
+      [ngClass]="{ 'btn-primary': selectedCategory === cat.id, 'btn-light': selectedCategory !== cat.id }"
+      (click)="filterByCategory(cat.id)">
+      {{ cat.name }}
+    </button>
+  </div>
+
+  <!-- Kart listesi -->
+  <div class="row">
+    <div class="col-12 mb-4" *ngFor="let ticket of filteredTickets">
+      <a [routerLink]="['/support-tickets', ticket.id]" class="text-decoration-none text-dark">
+        <div class="card shadow-sm hoverable w-100">
+          <div class="card-body d-flex align-items-center">
+
+            <!-- Avatar: Atanan Kullanıcı -->
+            <div class="me-4 text-center">
+              <div class="symbol symbol-circle symbol-48px custom-avatar-gradient d-flex align-items-center justify-content-center text-white fw-bold fs-6">
+                {{ getInitials(ticket.assignedToUser?.fullName || 'Y') }}
+              </div>
+              <div class="fw-semibold text-muted small mt-1">
+                {{ ticket.assignedToUser?.fullName || 'Atanmamış' }}
+              </div>
+            </div>
+
+            <!-- İçerik -->
+            <div class="flex-grow-1">
+              <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">🎫 {{ ticket.subject }}</h5>
+                <span class="text-muted small">
+                  <strong>📅</strong> {{ ticket.createdAt | date:'short' }}
+                </span>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-1"><strong>🆔 Talep No:</strong> {{ ticket.ticketNumber }}</div>
+                <div class="col-md-6 mb-1"><strong>📂 Kategori:</strong> {{ getCategoryName(ticket.category) }}</div>
+                <div class="col-md-6 mb-1">
+                  <strong>🚦 Öncelik:</strong>
+                  <span [ngClass]="getPriorityInfo(ticket.priority).class">
+                    {{ getPriorityInfo(ticket.priority).label }}
+                  </span>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <strong>📌 Durum:</strong>
+                  <span [ngClass]="getStatusInfo(ticket).class">
+                    {{ getStatusInfo(ticket).label }}
+                  </span>
+                </div>
+
+                <!-- Etiketler -->
+                <div class="col-12 mt-2" *ngIf="getTagsArray(ticket.tags).length > 0">
+                  <strong>🏷️ Etiketler:</strong>
+                  <span *ngFor="let tag of getTagsArray(ticket.tags)" class="badge bg-light-primary text-primary fw-semibold me-2">
+                    #{{ tag }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Yükleniyor -->
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Yükleniyor...</span>
+    </div>
+  </div>
+
+  <!-- Boş liste -->
+  <div *ngIf="!loading && filteredTickets.length === 0" class="text-center text-muted mt-5">
+    Seçilen kategoriye ait destek talebi bulunmamaktadır.
+  </div>
+</div>

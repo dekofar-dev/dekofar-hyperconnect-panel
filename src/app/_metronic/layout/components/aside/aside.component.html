@@ -1,0 +1,87 @@
+<!--begin::Brand-->
+<div class="aside-logo flex-column-auto px-9 mb-9" id="kt_aside_logo">
+  <!--begin::Logo-->
+  <a routerLink="/">
+    <img alt="Logo" src="./assets/media/logos/demo3.svg" class="h-20px logo">
+  </a>
+  <!--end::Logo-->
+</div>
+<!--end::Brand-->
+
+<!-- begin::Aside menu -->
+<div class="aside-menu flex-column-fluid ps-5 pe-3 mb-9" id="kt_aside_menu">
+  <div
+    #ktAsideScroll
+    id="kt_aside_menu_wrapper"
+    class="w-100 hover-scroll-overlay-y d-flex pe-2"
+    data-kt-scroll="true"
+    data-kt-scroll-activate="{default: false, lg: true}"
+    data-kt-scroll-dependencies="#kt_aside_logo, #kt_aside_footer"
+    data-kt-scroll-wrappers="#kt_aside_menu"
+    data-kt-scroll-max-height="auto"
+    data-kt-scroll-offset="150px"
+  >
+    <div
+      id="#kt_aside_menu"
+      data-kt-menu="true"
+      class="menu menu-column menu-rounded fw-bold my-auto"
+    >
+      <app-aside-menu id="asideMenu"></app-aside-menu>
+    </div>
+  </div>
+</div>
+<!-- end::Aside menu -->
+
+<!--begin::Footer-->
+<div class="aside-footer flex-column-auto px-9" id="kt_aside_footer">
+  <!--begin::User panel-->
+  <div class="d-flex flex-stack">
+    <!--begin::Wrapper-->
+    <div class="d-flex align-items-center">
+      <!--begin::Avatar (Baş Harfler)-->
+<!--begin::Avatar (Baş Harfler)-->
+<div class="symbol symbol-circle symbol-48px custom-avatar-gradient d-flex align-items-center justify-content-center text-white fw-bold fs-6">
+  <span *ngIf="user">{{ getInitials(user.fullName) }}</span>
+</div>
+<!--end::Avatar-->
+
+      <!--end::Avatar-->
+
+      <!--begin::User info-->
+      <div class="ms-2">
+        <!--begin::Name-->
+        <a href="#" class="text-gray-800 text-hover-primary fs-6 fw-bolder lh-1">
+          {{ user?.fullName }}
+        </a>
+        <!--end::Name-->
+
+        <!--begin::Role-->
+        <span class="text-muted fw-bold d-block fs-7 lh-1">
+          {{ user?.role }}
+        </span>
+        <!--end::Role-->
+      </div>
+      <!--end::User info-->
+    </div>
+    <!--end::Wrapper-->
+
+    <!--begin::User menu-->
+    <div class="ms-1">
+      <!-- begin::Toggle -->
+      <div
+        class="btn btn-sm btn-icon btn-active-color-primary position-relative me-n2"
+        data-kt-menu-trigger="click"
+        data-kt-menu-attach="parent"
+        data-kt-menu-placement="bottom-end"
+        data-kt-menu-flip="bottom"
+      >
+        <img src="./assets/media/icons/duotune/coding/cod001.svg" alt="menu icon" />
+      </div>
+      <!-- end::Toggle  -->
+      <app-user-inner></app-user-inner>
+    </div>
+    <!--end::User menu-->
+  </div>
+  <!--end::User panel-->
+</div>
+<!--end::Footer-->
