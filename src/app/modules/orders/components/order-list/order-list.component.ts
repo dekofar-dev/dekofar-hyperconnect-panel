@@ -18,6 +18,8 @@ export class OrderListComponent implements OnInit {
   searchQuery: string = '';
   searchResults: Order[] | null = null;
   searchTimeout: any = null;
+  paymentFilter: string = '';
+  fulfillmentFilter: string = '';
 
   constructor(private shopifyService: OrdersService, private router: Router) {}
 
@@ -56,6 +58,14 @@ export class OrderListComponent implements OnInit {
     if (this.nextPageInfo && !this.isLoading) {
       this.loadOrders();
     }
+  }
+
+  get filteredOrders(): Order[] {
+    const list = this.searchResults || this.confirmedOrders;
+    return list.filter(o =>
+      (this.paymentFilter ? o.financial_status === this.paymentFilter : true) &&
+      (this.fulfillmentFilter ? o.fulfillment_status === this.fulfillmentFilter : true)
+    );
   }
 
   // ✅ Satıra tıklayınca detay sayfasına git

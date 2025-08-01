@@ -121,6 +121,26 @@ get hasNextOrder(): boolean {
     alert('🗃️ Sipariş arşivlendi (örnek işlem)');
   }
 
+  saveNote(): void {
+    if (!this.order) return;
+    this.ordersService
+      .updateOrderNote(this.order.orderId, this.updatedNote)
+      .subscribe({
+        next: () => alert('Not kaydedildi'),
+        error: () => alert('Not güncellenemedi')
+      });
+  }
+
+  saveTags(): void {
+    if (!this.order) return;
+    this.ordersService
+      .updateOrderTags(this.order.orderId, this.updatedTags)
+      .subscribe({
+        next: () => alert('Etiketler güncellendi'),
+        error: () => alert('Etiketler güncellenemedi')
+      });
+  }
+
   sendInvoice(orderId: number): void {
     alert('📩 Fatura gönderme işlemi başlatıldı (örnek)');
   }
