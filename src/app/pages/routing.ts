@@ -73,11 +73,16 @@ const Routing: Routes = [
     loadChildren: () =>
       import('../modules/orders/orders.module').then((m) => m.OrdersModule),
   },
-{
-  path: 'support-tickets',
-  loadChildren: () =>
-    import('../modules/support-tickets/support-tickets.module').then((m) => m.SupportTicketsModule),
-},
+  {
+    path: 'mailbox',
+    loadChildren: () =>
+      import('../modules/mailbox/mailbox.module').then((m) => m.MailboxModule),
+  },
+  {
+    path: 'support-tickets',
+    loadChildren: () =>
+      import('../modules/support-tickets/support-tickets.module').then((m) => m.SupportTicketsModule),
+  },
   {
     path: '',
     redirectTo: '/dashboard',
