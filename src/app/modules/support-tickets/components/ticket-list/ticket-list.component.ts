@@ -12,6 +12,8 @@ export class TicketListComponent implements OnInit {
   filteredTickets: SupportTicketDto[] = [];
   loading = true;
   selectedCategory: number | null = null;
+  selectedStatus: number | null = null;
+  selectedPriority: number | null = null;
 
   constructor(
     private ticketService: SupportTicketService,
@@ -93,10 +95,26 @@ this.ticketService.getAll().subscribe({
   }
 
   // Kategoriye göre filtrele
+  filterTickets(): void {
+    this.filteredTickets = this.tickets.filter(t =>
+      (this.selectedCategory === null || t.category === this.selectedCategory) &&
+      (this.selectedStatus === null || t.status === this.selectedStatus) &&
+      (this.selectedPriority === null || t.priority === this.selectedPriority)
+    );
+  }
+
   filterByCategory(category: number | null): void {
     this.selectedCategory = category;
-    this.filteredTickets = category === null
-      ? this.tickets
-      : this.tickets.filter(t => t.category === category);
+    this.filterTickets();
+  }
+
+  onStatusChange(status: number | null): void {
+    this.selectedStatus = status;
+    this.filterTickets();
+  }
+
+  onPriorityChange(priority: number | null): void {
+    this.selectedPriority = priority;
+    this.filterTickets();
   }
 }

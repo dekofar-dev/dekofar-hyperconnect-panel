@@ -21,6 +21,19 @@
       (click)="filterByCategory(cat.id)">
       {{ cat.name }}
     </button>
+    <select class="form-select form-select-sm w-auto" [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange($event)">
+      <option [ngValue]="null">Durum</option>
+      <option [ngValue]="0">Açık</option>
+      <option [ngValue]="1">İnceleme</option>
+      <option [ngValue]="2">Cevap Bekleniyor</option>
+      <option [ngValue]="3">Kapandı</option>
+    </select>
+    <select class="form-select form-select-sm w-auto" [(ngModel)]="selectedPriority" (ngModelChange)="onPriorityChange($event)">
+      <option [ngValue]="null">Öncelik</option>
+      <option [ngValue]="1">Yüksek</option>
+      <option [ngValue]="2">Orta</option>
+      <option [ngValue]="3">Düşük</option>
+    </select>
   </div>
 
   <!-- Kart listesi -->
