@@ -1,6 +1,7 @@
 <div class="container-fluid px-0">
   <!-- Kategori filtre butonları -->
   <div class="mb-4 d-flex flex-wrap gap-2">
+    <input type="text" class="form-control form-control-sm w-auto" placeholder="Ara" [(ngModel)]="search" (ngModelChange)="onSearchChange()" />
     <button class="btn btn-sm"
             [ngClass]="{ 'btn-primary': selectedCategory === null, 'btn-light': selectedCategory !== null }"
             (click)="filterByCategory(null)">
@@ -28,17 +29,11 @@
       <option [ngValue]="2">Cevap Bekleniyor</option>
       <option [ngValue]="3">Kapandı</option>
     </select>
-    <select class="form-select form-select-sm w-auto" [(ngModel)]="selectedPriority" (ngModelChange)="onPriorityChange($event)">
-      <option [ngValue]="null">Öncelik</option>
-      <option [ngValue]="1">Yüksek</option>
-      <option [ngValue]="2">Orta</option>
-      <option [ngValue]="3">Düşük</option>
-    </select>
   </div>
 
   <!-- Kart listesi -->
   <div class="row">
-    <div class="col-12 mb-4" *ngFor="let ticket of filteredTickets">
+    <div class="col-12 mb-4" *ngFor="let ticket of tickets">
       <a [routerLink]="['/support-tickets', ticket.id]" class="text-decoration-none text-dark">
         <div class="card shadow-sm hoverable w-100">
           <div class="card-body d-flex align-items-center">
@@ -102,7 +97,10 @@
   </div>
 
   <!-- Boş liste -->
-  <div *ngIf="!loading && filteredTickets.length === 0" class="text-center text-muted mt-5">
-    Seçilen kategoriye ait destek talebi bulunmamaktadır.
+  <div *ngIf="!loading && tickets.length === 0" class="text-center text-muted mt-5">
+    Destek talebi bulunamadı.
+  </div>
+  <div class="text-center my-5" *ngIf="hasMore && !loading">
+    <button class="btn btn-light-primary" (click)="loadTickets()">Daha Fazla</button>
   </div>
 </div>
