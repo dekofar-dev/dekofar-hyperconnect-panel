@@ -12,6 +12,20 @@ export class TicketDetailComponent implements OnInit {
   ticket?: SupportTicketDto;
   loading = true;
   errorMessage: string | null = null;
+  statusOptions = [
+    { id: 0, label: 'Açık' },
+    { id: 1, label: 'İnceleme' },
+    { id: 2, label: 'Cevap Bekleniyor' },
+    { id: 3, label: 'Kapandı' }
+  ];
+  priorityOptions = [
+    { id: 1, label: 'Yüksek' },
+    { id: 2, label: 'Orta' },
+    { id: 3, label: 'Düşük' }
+  ];
+  selectedStatus: number | null = null;
+  selectedPriority: number | null = null;
+  noteText = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -33,6 +47,8 @@ export class TicketDetailComponent implements OnInit {
     this.ticketService.getById(this.ticketId).subscribe({
       next: (res) => {
         this.ticket = res;
+        this.selectedStatus = res.status;
+        this.selectedPriority = res.priority;
         this.loading = false;
       },
       error: (err) => {
@@ -101,5 +117,28 @@ export class TicketDetailComponent implements OnInit {
 
   hasHistory(): boolean {
     return !!this.ticket?.history && this.ticket.history.length > 0;
+  }
+
+  updateTicket(): void {
+    if (!this.ticket) return;
+    const data: any = {
+      status: this.selectedStatus,
+      priority: this.selectedPriority
+    };
+    this.ticketService.update(this.ticket.id, data).subscribe({
+      next: () => alert('Güncellendi'),
+      error: () => alert('Güncellenemedi')
+    });
+  }
+
+  addNote(): void {
+    if (!this.ticket || !this.noteText.trim()) return;
+    this.ticketService.addNote(this.ticket.id, this.noteText).subscribe({
+      next: () => {
+        this.noteText = '';
+        this.fetchTicketDetail();
+      },
+      error: () => alert('Not eklenemedi')
+    });
   }
 }

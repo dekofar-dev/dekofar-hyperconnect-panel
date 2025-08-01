@@ -109,6 +109,41 @@
     </ul>
   </div>
 
+  <!-- Güncelle -->
+  <div class="card mb-5 mt-5">
+    <div class="card-header">
+      <h5 class="card-title">Güncelle</h5>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Durum</label>
+          <select class="form-select" [(ngModel)]="selectedStatus">
+            <option *ngFor="let s of statusOptions" [ngValue]="s.id">{{ s.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Öncelik</label>
+          <select class="form-select" [(ngModel)]="selectedPriority">
+            <option *ngFor="let p of priorityOptions" [ngValue]="p.id">{{ p.label }}</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-primary" (click)="updateTicket()">Kaydet</button>
+    </div>
+  </div>
+
+  <!-- Not Ekle -->
+  <div class="card mb-5">
+    <div class="card-header">
+      <h5 class="card-title">Not Ekle</h5>
+    </div>
+    <div class="card-body">
+      <textarea class="form-control" rows="3" [(ngModel)]="noteText"></textarea>
+      <button class="btn btn-sm btn-light-primary mt-2" (click)="addNote()" [disabled]="!noteText.trim()">Ekle</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- Yükleniyor -->

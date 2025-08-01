@@ -62,6 +62,11 @@ export class SupportTicketService {
     });
   }
 
+  // 🟢 Talep güncelle (durum, öncelik, kategori vb.)
+  update(ticketId: number, data: any): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${ticketId}`, data);
+  }
+
   // 🔄 Atanabilir kullanıcıları getir (detay ekranı için opsiyonel)
   getAssignableUsers(): Observable<{ id: string; fullName: string; email: string; role: string }[]> {
     return this.http.get<{ id: string; fullName: string; email: string; role: string }[]>(
