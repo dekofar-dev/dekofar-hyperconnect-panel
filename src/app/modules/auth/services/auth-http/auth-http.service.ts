@@ -20,9 +20,9 @@ export class AuthHTTPService {
       password,
     });
   }
-getProfile(): Observable<UserModel> {
-  return this.http.get<UserModel>(`${this.API_URL}/auth/profile`);
-}
+  getProfile(): Observable<UserModel> {
+    return this.http.get<UserModel>(`${environment.apiUrl}/auth/profile`);
+  }
 
   getUserByToken(token: string): Observable<UserModel> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
