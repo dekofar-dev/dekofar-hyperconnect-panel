@@ -6,7 +6,7 @@ export interface UserModel {
   fullName: string;
   role: string;
 
-  // Metronic layout için gerekli alanlar 👇
+  // 👇 Opsiyonel Metronic alanları (backend'den geliyorsa sorun yok)
   pic?: string;
   firstname?: string;
   lastname?: string;

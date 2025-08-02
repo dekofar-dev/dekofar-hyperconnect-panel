@@ -1,3 +1,5 @@
+// src/app/modules/auth/services/auth-http/auth-http.service.ts
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -5,13 +7,12 @@ import { environment } from '../../../../../environments/environment';
 import { AuthModel } from '../../models/auth.model';
 import { UserModel } from '../../models/user.model';
 
-const API_USERS_URL = `${environment.apiUrl}/auth`;
+const API_USERS_URL = `${environment.apiUrl}/Auth`; // 🔧 düzeltildi
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthHTTPService {
-  [x: string]: any;
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<AuthModel> {
@@ -20,12 +21,13 @@ export class AuthHTTPService {
       password,
     });
   }
+
   getProfile(): Observable<UserModel> {
-    return this.http.get<UserModel>(`${environment.apiUrl}/auth/profile`);
+    return this.http.get<UserModel>(`${API_USERS_URL}/me`);
   }
 
   getUserByToken(token: string): Observable<UserModel> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<UserModel>(`${API_USERS_URL}/profile`, { headers });
+    return this.http.get<UserModel>(`${API_USERS_URL}/me`, { headers });
   }
 }

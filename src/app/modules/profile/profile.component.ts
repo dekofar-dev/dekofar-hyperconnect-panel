@@ -7,28 +7,28 @@ import { UserModel } from '../../modules/auth/models/user.model';
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
-  user: UserModel = {
-    fullName: '',
-    email: '',
-    role: '',
-    id: ''
-  };
+  user?: UserModel;
 
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((u) => {
-      if (u) {
-        this.user = u;
-      }
+      this.user = u ?? undefined;
     });
   }
 
-  getInitials(): string {
-    const name = this.user.fullName ?? '';
-    const parts = name.trim().split(' ');
-    return parts.length >= 2
-      ? parts[0][0].toUpperCase() + parts[1][0].toUpperCase()
-      : parts[0][0]?.toUpperCase() ?? '?';
+  get initials(): string {
+    if (!this.user) return '?';
+
+    const name = this.user.fullName?.trim() ?? '';
+    const parts = name.split(' ');
+
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    } else if (parts.length === 1 && parts[0].length > 0) {
+      return parts[0][0].toUpperCase();
+    }
+
+    return '?';
   }
 }

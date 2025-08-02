@@ -31,7 +31,6 @@ export class LoginComponent implements OnInit {
     this.isLoading$ = this.authService.isLoading$;
     this.initForm();
 
-    // Kullanıcı zaten giriş yaptıysa yönlendir
     if (this.authService.currentUserValue) {
       this.router.navigate(['/']);
     }

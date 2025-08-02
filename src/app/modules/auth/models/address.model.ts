@@ -4,3 +4,4 @@ export class AddressModel {
   state: string;
   postCode: string;
 }
+

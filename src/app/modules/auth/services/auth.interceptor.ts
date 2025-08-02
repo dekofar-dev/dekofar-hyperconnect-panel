@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private tokenKey = 'auth_token';
+  private readonly tokenKey = 'auth_token';
 
   constructor(private router: Router) {}
 
@@ -22,7 +22,6 @@ export class AuthInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     const token = localStorage.getItem(this.tokenKey);
 
-    // Eğer token varsa Authorization header'ı ekle
     if (token) {
       request = request.clone({
         setHeaders: {
@@ -31,11 +30,9 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
 
-    // 401 hatasını yakala ve login'e yönlendir (opsiyonel)
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          // Oturum süresi doldu veya yetkisiz -> login sayfasına yönlendir
           localStorage.removeItem(this.tokenKey);
           this.router.navigate(['/auth/login']);
         }

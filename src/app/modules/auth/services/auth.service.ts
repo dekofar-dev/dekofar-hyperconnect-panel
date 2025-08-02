@@ -47,7 +47,7 @@ export class AuthService implements OnDestroy {
         return undefined;
       }),
       catchError((err) => {
-        console.error('login error', err);
+        console.error('Login error:', err);
         return of(undefined);
       }),
       finalize(() => this.isLoadingSubject.next(false))
@@ -61,8 +61,8 @@ export class AuthService implements OnDestroy {
         this.currentUserSubject.next(user);
       },
       error: (err) => {
-        console.error('Profil bilgisi alınamadı.', err);
-        this.logout(); // Token süresi geçmişse çıkış yaptır
+        console.error('Profil bilgisi alınamadı:', err);
+        this.logout();
       }
     });
 
@@ -76,6 +76,27 @@ export class AuthService implements OnDestroy {
     this.router.navigate(['/auth/login']);
   }
 
+  getToken(): string | null {
+    return localStorage.getItem(this.authLocalStorageToken);
+  }
+
+  getAuthFromLocalStorage(): { id: string; email: string; role: string } | null {
+    const authData = localStorage.getItem(this.authLocalStorageUser);
+    if (!authData) return null;
+
+    try {
+      const user = JSON.parse(authData);
+      return {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      };
+    } catch (e) {
+      console.error('❌ Kullanıcı bilgisi çözümlenemedi:', e);
+      return null;
+    }
+  }
+
   private setAuthToken(token: string): void {
     localStorage.setItem(this.authLocalStorageToken, token);
   }
@@ -84,30 +105,10 @@ export class AuthService implements OnDestroy {
     localStorage.setItem(this.authLocalStorageUser, JSON.stringify(user));
   }
 
-  private getUserInfo(): UserModel | undefined {  
+  private getUserInfo(): UserModel | undefined {
     const userJson = localStorage.getItem(this.authLocalStorageUser);
     return userJson ? JSON.parse(userJson) : undefined;
   }
-
-  private getAuthToken(): string | null {
-    return localStorage.getItem(this.authLocalStorageToken);
-  }
-getAuthFromLocalStorage(): { id: string; email: string; role: string } | null {
-  const authData = localStorage.getItem(this.authLocalStorageUser);
-  if (!authData) return null;
-
-  try {
-    const user = JSON.parse(authData);
-    return {
-      id: user.id,
-      email: user.email,
-      role: user.role
-    };
-  } catch (e) {
-    console.error('❌ Kullanıcı bilgisi çözümlenemedi:', e);
-    return null;
-  }
-}
 
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());

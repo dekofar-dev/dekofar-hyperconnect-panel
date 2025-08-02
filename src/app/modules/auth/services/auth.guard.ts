@@ -11,16 +11,20 @@ import { AuthService } from './auth.service';
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
     const currentUser = this.authService.currentUserValue;
     if (currentUser) {
       return true;
     }
 
-    this.authService.logout();
+    this.authService.logout(); // token ve user temizlenir
     this.router.navigate(['/auth/login'], {
       queryParams: { returnUrl: state.url },
     });
+
     return false;
   }
 }
