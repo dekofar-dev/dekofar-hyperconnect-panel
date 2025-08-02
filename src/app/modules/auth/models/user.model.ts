@@ -10,4 +10,6 @@ export interface UserModel {
   pic?: string;
   firstname?: string;
   lastname?: string;
+  phone?: string;
+  address?: string;
 }

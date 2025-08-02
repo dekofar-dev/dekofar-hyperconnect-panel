@@ -27,8 +27,8 @@ export class TicketDetailComponent implements OnInit {
   selectedStatus: number | null = null;
   selectedPriority: number | null = null;
   noteText = '';
-  assignableUsers: { id: string; fullName: string }[] = [];
-  selectedUserId: string | null = null;
+  assignableUsers: { id: string | number; fullName: string }[] = [];
+  selectedUserId: string | number | null = null;
   isAdmin = false;
   isSupport = false;
 
