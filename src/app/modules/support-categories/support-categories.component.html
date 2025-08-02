@@ -1,0 +1,24 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Support Categories</h3>
+  </div>
+  <div class="card-body" *ngIf="!loading; else loadingTpl">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of categories">
+          <td>{{ c.name }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <ng-template #loadingTpl>
+    <div class="text-center py-10">
+      <span class="spinner-border"></span>
+    </div>
+  </ng-template>
+</div>

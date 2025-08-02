@@ -1,17 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SupportTicketsComponent } from './support-tickets.component';
 import { TicketListComponent } from './components/ticket-list/ticket-list.component';
 import { TicketCreateComponent } from './components/ticket-create/ticket-create.component';
 import { TicketDetailComponent } from './components/ticket-detail/ticket-detail.component';
 import { AuthGuard } from '../auth/services/auth.guard';
+import { RoleGuard } from '../auth/services/role.guard';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'my',
     component: TicketListComponent,
-    canActivate: [AuthGuard]
-  },           // /support-tickets
+    canActivate: [AuthGuard],
+    data: { mode: 'my' }
+  },
+  {
+    path: 'all',
+    component: TicketListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin'], mode: 'all' }
+  },
   {
     path: 'create',
     component: TicketCreateComponent,
@@ -22,7 +29,11 @@ const routes: Routes = [
     component: TicketDetailComponent,
     canActivate: [AuthGuard]
   },      // /support-tickets/:id
-  
+  {
+    path: '',
+    redirectTo: 'my',
+    pathMatch: 'full'
+  }
 ];
 
 
