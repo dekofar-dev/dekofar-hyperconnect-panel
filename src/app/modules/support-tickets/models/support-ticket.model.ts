@@ -41,7 +41,7 @@ export interface SupportTicketCreateDto {
   dueDate?: string;
 
   // ✅ Atama yapılacaksa bu alan gerekli:
-  assignedToUserId?: string;
+  assignedToUserId?: string | number;
 
   // Opsiyonel gösterim için
   assignedToUser?: {
@@ -65,7 +65,8 @@ export interface SupportTicketDto {
   customerName?: string;
   shopifyOrderId?: string;
 
-  assignedToUserId?: string;
+  assignedToUserId?: string | number;
+  createdByUserId?: string | number;
   assignedToUser?: {
     fullName: string;
   };

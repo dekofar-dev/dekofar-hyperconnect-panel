@@ -6,7 +6,7 @@
       <div class="d-flex flex-wrap align-items-center gap-3">
         <h2 class="fw-bold text-gray-800 mb-0">#{{ order.orderNumber }}</h2>
         <span class="badge"
-              [ngClass]="order?.financialStatus === 'paid' ? 'badge-success' : 'badge-warning'">
+              [ngClass]="order.financialStatus === 'paid' ? 'badge-success' : 'badge-warning'">
           🚚 {{ order.fulfillmentStatus === 'fulfilled' ? 'Gönderildi' : 'Gönderilmedi' }}
         </span>
         <span class="badge"
@@ -36,12 +36,12 @@
         <div class="card mb-5">
           <div class="card-body d-flex">
             <div class="me-4">
-              <img [src]="order.lineItems[0]?.imageUrl || defaultImage" class="w-50px h-50px" alt="" />
+              <img [src]="order.lineItems[0].imageUrl || defaultImage" class="w-50px h-50px" alt="" />
             </div>
             <div class="flex-grow-1">
-              <div class="fw-semibold">{{ order.lineItems[0]?.title }}</div>
-              <div class="text-muted">{{ order.lineItems[0]?.variantTitle || 'Standart' }}</div>
-              <div class="text-muted">{{ order.lineItems[0]?.quantity }} x {{ order.totalPrice }} {{ order.currency }}</div>
+              <div class="fw-semibold">{{ order.lineItems[0].title }}</div>
+              <div class="text-muted">{{ order.lineItems[0].variantTitle || 'Standart' }}</div>
+              <div class="text-muted">{{ order.lineItems[0].quantity }} x {{ order.totalPrice }} {{ order.currency }}</div>
             </div>
           </div>
         </div>
@@ -165,24 +165,24 @@
           <div class="card-body px-4 pt-3 pb-4">
             <div class="mb-2">
               <i class="bi bi-person-fill me-2 text-muted"></i>
-              {{ order.customer?.firstName || '-' }} {{ order.customer?.lastName || '' }}
+              {{ order.customer.firstName || '-' }} {{ order.customer.lastName || '' }}
             </div>
             <div class="mb-2">
               <i class="bi bi-telephone-fill me-2 text-muted"></i>
-              {{ order.customer?.phone || order.billingAddress?.phone || 'Telefon yok' }}
+              {{ order.customer.phone || order.billingAddress.phone || 'Telefon yok' }}
             </div>
             <div class="mb-2">
               <i class="bi bi-envelope-fill me-2 text-muted"></i>
-              {{ order.customer?.email || 'Email yok' }}
+              {{ order.customer.email || 'Email yok' }}
             </div>
             <hr />
             <div class="mb-2">
               <i class="bi bi-geo-alt-fill me-2 text-muted"></i>
-              {{ order.billingAddress?.address1 || '-' }}
+              {{ order.billingAddress.address1 || '-' }}
             </div>
             <div class="mb-2">
               <i class="bi bi-map-fill me-2 text-muted"></i>
-              {{ order.billingAddress?.zip || '' }} {{ order.billingAddress?.city || '' }}, {{ order.billingAddress?.province || '' }}
+              {{ order.billingAddress.zip || '' }} {{ order.billingAddress.city || '' }}, {{ order.billingAddress.province || '' }}
             </div>
             <hr />
             <div class="mb-2 text-muted small">
