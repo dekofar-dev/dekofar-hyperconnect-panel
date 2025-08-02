@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SupportTicketService } from '../../services/support-ticket.service';
 import { SupportTicketDto } from '../../models/support-ticket.model';
@@ -22,13 +22,17 @@ export class TicketListComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
+  mode: 'my' | 'all' = 'my';
+
   constructor(
     private ticketService: SupportTicketService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.mode = (this.route.snapshot.data['mode'] as 'my' | 'all') || 'my';
     this.loadTickets(true);
   }
 
@@ -41,9 +45,6 @@ export class TicketListComponent implements OnInit, OnDestroy {
     if (!this.hasMore || this.loading) return;
 
     this.loading = true;
-    const currentUser = this.auth.getAuthFromLocalStorage();
-    const isAdmin = currentUser?.role === 'Admin';
-
     const query: SupportTicketQuery = {
       pageNumber: this.page,
       pageSize: this.pageSize,
@@ -55,8 +56,9 @@ export class TicketListComponent implements OnInit, OnDestroy {
     const sub = this.ticketService.list(query).subscribe({
       next: (res) => {
         let items = res.items;
-        if (!isAdmin) {
-          items = items.filter(t => t.assignedToUserId === currentUser?.id);
+        if (this.mode === 'my') {
+          const currentUser = this.auth.getAuthFromLocalStorage();
+          items = items.filter(t => t.createdByUserId === currentUser?.id || t.assignedToUserId === currentUser?.id);
         }
         this.tickets.push(...items);
         this.hasMore = items.length === this.pageSize;

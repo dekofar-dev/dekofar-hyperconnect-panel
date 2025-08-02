@@ -84,6 +84,21 @@ const Routing: Routes = [
       import('../modules/support-tickets/support-tickets.module').then((m) => m.SupportTicketsModule),
   },
   {
+    path: 'support-categories',
+    loadChildren: () =>
+      import('../modules/support-categories/support-categories.module').then((m) => m.SupportCategoriesModule),
+  },
+  {
+    path: 'discounts',
+    loadChildren: () =>
+      import('../modules/discounts/discounts.module').then((m) => m.DiscountsModule),
+  },
+  {
+    path: 'users',
+    loadChildren: () =>
+      import('../modules/users/users.module').then((m) => m.UsersModule),
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',

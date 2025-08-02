@@ -1,0 +1,32 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Discounts</h3>
+  </div>
+  <div class="card-body" *ngIf="!loading; else loadingTpl">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Status</th>
+          <th>Created By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of discounts">
+          <td>{{ d.name }}</td>
+          <td>{{ d.type }}</td>
+          <td>{{ d.value }}</td>
+          <td>{{ d.status }}</td>
+          <td>{{ d.createdBy }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <ng-template #loadingTpl>
+    <div class="text-center py-10">
+      <span class="spinner-border"></span>
+    </div>
+  </ng-template>
+</div>
