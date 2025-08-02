@@ -94,6 +94,11 @@ const Routing: Routes = [
       import('../modules/discounts/discounts.module').then((m) => m.DiscountsModule),
   },
   {
+    path: 'commissions',
+    loadChildren: () =>
+      import('../modules/commissions/commissions.module').then((m) => m.CommissionsModule),
+  },
+  {
     path: 'users',
     loadChildren: () =>
       import('../modules/users/users.module').then((m) => m.UsersModule),

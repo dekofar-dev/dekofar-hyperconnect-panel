@@ -41,10 +41,43 @@
         {{ u.phone }}
       </div>
 
-      <div *ngIf="u.address" class="text-gray-600">
-        <i class="bi bi-geo-alt me-2"></i>
-        {{ u.address }}
+        <div *ngIf="u.address" class="text-gray-600">
+          <i class="bi bi-geo-alt me-2"></i>
+          {{ u.address }}
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+<div class="card mt-5" *ngIf="user">
+  <div class="card-header">
+    <h3 class="card-title">Komisyon Geçmişi</h3>
+  </div>
+  <div class="card-body" *ngIf="!commissionsLoading; else commissionsLoadingTpl">
+    <table class="table table-striped" *ngIf="commissions.length; else noCommissionsTpl">
+      <thead>
+        <tr>
+          <th>Sipariş ID</th>
+          <th>Tutar</th>
+          <th>Komisyon %</th>
+          <th>Tarih</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of commissions">
+          <td>{{ c.orderId }}</td>
+          <td>{{ c.amount }}</td>
+          <td>{{ c.percentage }}</td>
+          <td>{{ c.date | date: 'shortDate' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noCommissionsTpl>
+      <div class="text-center py-10">Kayıt bulunamadı.</div>
+    </ng-template>
+  </div>
+    <ng-template #commissionsLoadingTpl>
+      <div class="text-center py-10"><span class="spinner-border"></span></div>
+    </ng-template>
+  </div>
+
