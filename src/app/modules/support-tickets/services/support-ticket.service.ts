@@ -63,6 +63,16 @@ export class SupportTicketService {
     });
   }
 
+  // 🟢 Talebi çözüldü olarak işaretle (status=3)
+  markAsResolved(ticketId: number): Observable<void> {
+    return this.updateStatus(ticketId, 3);
+  }
+
+  // 🟢 Talebi okundu olarak işaretle
+  markAsRead(ticketId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${ticketId}/read`, {});
+  }
+
   // 🟢 Talebe not ekle
   addNote(ticketId: number, message: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${ticketId}/note`, {

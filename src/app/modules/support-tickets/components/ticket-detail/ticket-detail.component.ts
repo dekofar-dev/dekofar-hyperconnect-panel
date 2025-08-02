@@ -31,6 +31,7 @@ export class TicketDetailComponent implements OnInit {
   selectedUserId: string | number | null = null;
   isAdmin = false;
   isSupport = false;
+  currentUserEmail: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,6 +43,7 @@ export class TicketDetailComponent implements OnInit {
     const current = this.auth.getAuthFromLocalStorage();
     this.isAdmin = current?.role === 'Admin';
     this.isSupport = current?.role === 'Support';
+    this.currentUserEmail = current?.email || null;
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -67,6 +69,7 @@ export class TicketDetailComponent implements OnInit {
         this.selectedPriority = res.priority;
         this.selectedUserId = res.assignedToUserId || null;
         this.loading = false;
+        this.ticketService.markAsRead(this.ticketId).subscribe();
       },
       error: (err) => {
         console.error('Detay çekme hatası:', err);
@@ -149,14 +152,22 @@ export class TicketDetailComponent implements OnInit {
     });
   }
 
-  addNote(): void {
+  sendReply(): void {
     if (!this.ticket || !this.noteText.trim()) return;
     this.ticketService.addNote(this.ticket.id, this.noteText).subscribe({
       next: () => {
         this.noteText = '';
         this.fetchTicketDetail();
       },
-      error: () => alert('Not eklenemedi')
+      error: () => alert('Yanıt eklenemedi')
+    });
+  }
+
+  markResolved(): void {
+    if (!this.ticket) return;
+    this.ticketService.markAsResolved(this.ticket.id).subscribe({
+      next: () => this.fetchTicketDetail(),
+      error: () => alert('Güncellenemedi')
     });
   }
 }

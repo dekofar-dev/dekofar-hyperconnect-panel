@@ -74,6 +74,14 @@ export interface SupportTicketDto {
   createdBy: string;
   createdAt: string;
   status: SupportStatus;
+  /**
+   * Kullanıcıya göre okunmamış yanıt sayısı
+   */
+  unreadCount?: number;
+  /**
+   * Son yanıtın atıldığı zaman damgası
+   */
+  lastReplyAt?: string;
 
   notes: TicketNoteDto[];
   logs: TicketLogDto[];
