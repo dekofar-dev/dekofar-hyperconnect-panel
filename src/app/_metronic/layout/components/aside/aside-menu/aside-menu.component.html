@@ -28,29 +28,29 @@
     <span class="menu-title">PIN Ayarları</span>
   </a>
 </div>
-<!-- Support -->
+<!-- Destek Talepleri -->
 <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/communication/com003.svg'" class="svg-icon svg-icon-2"></span>
     </span>
-    <span class="menu-title">Support</span>
+    <span class="menu-title">Destek Talepleri</span>
     <span class="menu-arrow"></span>
   </span>
   <div class="menu-sub menu-sub-accordion">
     <div class="menu-item">
       <a class="menu-link" routerLink="/support-tickets/my" routerLinkActive="active">
-        <span class="menu-title">My Tickets</span>
+        <span class="menu-title">Taleplerim</span>
       </a>
     </div>
     <div class="menu-item" *ngIf="userRole === 'Admin'">
       <a class="menu-link" routerLink="/support-tickets/all" routerLinkActive="active">
-        <span class="menu-title">All Tickets</span>
+        <span class="menu-title">Tüm Talepler</span>
       </a>
     </div>
     <div class="menu-item" *ngIf="userRole === 'Admin'">
       <a class="menu-link" routerLink="/support-categories" routerLinkActive="active">
-        <span class="menu-title">Support Categories</span>
+        <span class="menu-title">Destek Kategorileri</span>
       </a>
     </div>
   </div>

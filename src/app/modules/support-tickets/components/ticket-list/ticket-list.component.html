@@ -51,9 +51,15 @@
             <!-- İçerik -->
             <div class="flex-grow-1">
               <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
-                <h5 class="mb-0">🎫 {{ ticket.subject }}</h5>
-                <span class="text-muted small">
-                  <strong>📅</strong> {{ ticket.createdAt | date:'short' }}
+                <h5 class="mb-0">
+                  🎫 {{ ticket.subject }}
+                  <span *ngIf="ticket.unreadCount && ticket.unreadCount > 0" class="badge bg-danger ms-2">
+                    {{ ticket.unreadCount }}
+                  </span>
+                </h5>
+                <span class="text-muted small d-flex flex-column text-end">
+                  <span><strong>📅</strong> {{ ticket.createdAt | date:'short' }}</span>
+                  <span *ngIf="ticket.lastReplyAt"><strong>💬</strong> {{ ticket.lastReplyAt | date:'short' }}</span>
                 </span>
               </div>
 

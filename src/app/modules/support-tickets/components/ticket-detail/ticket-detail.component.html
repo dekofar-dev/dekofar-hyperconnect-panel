@@ -8,6 +8,8 @@
     <p class="text-muted">
       Oluşturulma: {{ ticket.createdAt | date:'short' }}
       <br />
+      <span *ngIf="ticket.lastReplyAt">Son Yanıt: {{ ticket.lastReplyAt | date:'short' }}</span>
+      <br />
       <span class="badge bg-info text-dark mt-2">
         {{ ticket.shopifyOrderId ? 'Shopify Siparişi Referanslı' : 'Manuel Talep' }}
       </span>
@@ -74,12 +76,12 @@
     </ul>
   </div>
 
-  <!-- Notlar -->
+  <!-- Yanıtlar -->
   <div class="mb-5" *ngIf="hasNotes()">
-    <h5 class="fw-bold mb-3">📓 Notlar</h5>
-    <div class="border rounded bg-white">
-      <div *ngFor="let note of ticket.notes" class="border-bottom p-3">
-        <div class="fw-semibold">{{ note.createdBy }}</div>
+    <h5 class="fw-bold mb-3">💬 Yanıtlar</h5>
+    <div *ngFor="let note of ticket.notes" class="mb-3 d-flex" [ngClass]="{'justify-content-end': note.createdBy === currentUserEmail}">
+      <div class="p-3 rounded w-75" [ngClass]="note.createdBy === currentUserEmail ? 'bg-primary text-white' : 'bg-light'">
+        <div class="fw-semibold small">{{ note.createdBy }}</div>
         <div class="text-muted small">{{ note.createdAt | date:'short' }}</div>
         <div class="mt-2">{{ note.message }}</div>
       </div>
@@ -142,12 +144,13 @@
 
   <!-- Not Ekle -->
   <div class="card mb-5" *ngIf="isAdmin || isSupport">
-    <div class="card-header">
-      <h5 class="card-title">Not Ekle</h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Yanıt Yaz</h5>
+      <button *ngIf="ticket?.status !== 3" class="btn btn-sm btn-success" (click)="markResolved()">Çözüldü</button>
     </div>
     <div class="card-body">
       <textarea class="form-control" rows="3" [(ngModel)]="noteText"></textarea>
-      <button class="btn btn-sm btn-light-primary mt-2" (click)="addNote()" [disabled]="!noteText.trim()">Ekle</button>
+      <button class="btn btn-sm btn-light-primary mt-2" (click)="sendReply()" [disabled]="!noteText.trim()">Gönder</button>
     </div>
   </div>
 
