@@ -6,8 +6,12 @@ import { environment } from 'src/environments/environment';
 export interface AppUser {
   id: string;
   email: string;
-  role: string;
-  createdAt?: string;
+  fullName: string;
+  avatar?: string;
+  roles: string[];
+  totalSales: number;
+  totalCommission: number;
+  supportTicketCount: number;
 }
 
 @Injectable({ providedIn: 'root' })

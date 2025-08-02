@@ -27,4 +27,16 @@ export class UsersComponent implements OnInit {
       }
     });
   }
+
+  getInitials(name: string): string {
+    if (!name) {
+      return '';
+    }
+    return name
+      .split(' ')
+      .filter((n) => n)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  }
 }
