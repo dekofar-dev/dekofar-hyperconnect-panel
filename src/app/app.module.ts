@@ -14,6 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthService } from './modules/auth/services/auth.service';
 import { AuthInterceptor } from './modules/auth/services/auth.interceptor'; // 🔥 interceptor import edildi
+import { LockScreenModule } from './modules/lock-screen/lock-screen.module';
 
 import { environment } from 'src/environments/environment';
 // #fake-start#
@@ -52,6 +53,7 @@ function appInitializer(authService: AuthService) {
     AppRoutingModule,
     InlineSVGModule.forRoot(),
     NgbModule,
+    LockScreenModule,
   ],
   providers: [
     {

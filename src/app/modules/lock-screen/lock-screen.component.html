@@ -1,0 +1,24 @@
+<div class="lock-overlay">
+  <div class="lock-card">
+    <div class="text-center mb-4">
+      <img *ngIf="user?.pic" [src]="user.pic" class="avatar" alt="avatar" />
+      <div *ngIf="!user?.pic" class="avatar placeholder">{{ initials }}</div>
+      <div class="fw-bold fs-4 mt-2">{{ user?.fullName }}</div>
+    </div>
+    <form (ngSubmit)="submit()" autocomplete="off">
+      <input
+        type="password"
+        maxlength="4"
+        [(ngModel)]="pin"
+        name="pin"
+        class="form-control form-control-lg text-center mb-3"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        autocomplete="off"
+        (keypress)="allowOnlyDigits($event)"
+      />
+      <div class="text-danger mb-3" *ngIf="error">{{ error }}</div>
+      <button type="submit" class="btn btn-primary w-100">Kilidi Aç</button>
+    </form>
+  </div>
+</div>
