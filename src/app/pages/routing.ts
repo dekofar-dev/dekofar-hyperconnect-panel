@@ -99,6 +99,13 @@ const Routing: Routes = [
       import('../modules/users/users.module').then((m) => m.UsersModule),
   },
   {
+    path: 'pin-settings',
+    loadChildren: () =>
+      import('../modules/pin-settings/pin-settings.module').then(
+        (m) => m.PinSettingsModule
+      ),
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',

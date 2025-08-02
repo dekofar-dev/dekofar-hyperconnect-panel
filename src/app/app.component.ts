@@ -8,6 +8,7 @@ import { locale as jpLang } from './modules/i18n/vocabs/jp';
 import { locale as deLang } from './modules/i18n/vocabs/de';
 import { locale as frLang } from './modules/i18n/vocabs/fr';
 import { ThemeModeService } from './_metronic/partials/layout/theme-mode-switcher/theme-mode.service';
+import { LockScreenService } from './modules/auth/services/lock-screen.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -19,7 +20,8 @@ import { ThemeModeService } from './_metronic/partials/layout/theme-mode-switche
 export class AppComponent implements OnInit {
   constructor(
     private translationService: TranslationService,
-    private modeService: ThemeModeService
+    private modeService: ThemeModeService,
+    public lockService: LockScreenService
   ) {
     // register translations
     this.translationService.loadTranslations(
@@ -34,5 +36,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.modeService.init();
+    this.lockService.init();
   }
 }

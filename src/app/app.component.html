@@ -1,1 +1,2 @@
 <router-outlet></router-outlet>
+<app-lock-screen *ngIf="lockService.isLocked$ | async"></app-lock-screen>
