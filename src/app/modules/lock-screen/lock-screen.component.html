@@ -1,7 +1,7 @@
 <div class="lock-overlay">
   <div class="lock-card">
     <div class="text-center mb-4">
-      <img *ngIf="user?.pic" [src]="user.pic" class="avatar" alt="avatar" />
+      <!-- <img *ngIf="user?.pic" [src]="user.pic" class="avatar" alt="avatar" /> -->
       <div *ngIf="!user?.pic" class="avatar placeholder">{{ initials }}</div>
       <div class="fw-bold fs-4 mt-2">{{ user?.fullName }}</div>
     </div>
