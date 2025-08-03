@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LogoutComponent implements OnInit {
   constructor(private authService: AuthService) {
+    // Bileşen yüklendiğinde oturumu kapat
     this.authService.logout();
   }
 

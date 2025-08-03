@@ -2,12 +2,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { AuthModel } from '../../models/auth.model';
 import { UserModel } from '../../models/user.model';
 
-const API_USERS_URL = `${environment.apiUrl}/Auth`; // 🔧 düzeltildi
+// API temel adresi (environment üzerinden)
+const API_USERS_URL = `${environment.apiUrl}/Auth`;
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ const API_USERS_URL = `${environment.apiUrl}/Auth`; // 🔧 düzeltildi
 export class AuthHTTPService {
   constructor(private http: HttpClient) {}
 
+  // Kullanıcı giriş isteği
   login(email: string, password: string): Observable<AuthModel> {
     return this.http.post<AuthModel>(`${API_USERS_URL}/login`, {
       email,
@@ -22,12 +24,22 @@ export class AuthHTTPService {
     });
   }
 
-  getProfile(): Observable<UserModel> {
-    return this.http.get<UserModel>(`${API_USERS_URL}/me`);
+  // Yeni kullanıcı kayıt isteği
+  register(fullName: string, email: string, password: string): Observable<AuthModel> {
+    return this.http.post<AuthModel>(`${API_USERS_URL}/register`, {
+      fullName,
+      email,
+      password,
+    });
   }
 
-  getUserByToken(token: string): Observable<UserModel> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<UserModel>(`${API_USERS_URL}/me`, { headers });
+  // Oturumu sonlandırma isteği
+  logout(): Observable<void> {
+    return this.http.post<void>(`${API_USERS_URL}/logout`, {});
+  }
+
+  // Oturum açmış kullanıcının profilini getirme
+  getProfile(): Observable<UserModel> {
+    return this.http.get<UserModel>(`${API_USERS_URL}/me`);
   }
 }

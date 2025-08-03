@@ -20,8 +20,10 @@ export class AuthInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    // LocalStorage'dan token'ı al
     const token = localStorage.getItem(this.tokenKey);
 
+    // Token varsa tüm isteklere Authorization header'ı ekle
     if (token) {
       request = request.clone({
         setHeaders: {
@@ -30,6 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
 
+    // İstek sonucunu yakala ve 401 hatasında çıkış yap
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
