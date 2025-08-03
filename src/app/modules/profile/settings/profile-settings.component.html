@@ -1,0 +1,90 @@
+<div class="row g-5">
+  <div class="col-lg-6">
+    <div class="card mb-5">
+      <div class="card-header">
+        <h3 class="fw-bolder">Profilim</h3>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="mb-3">
+            <label class="form-label">Ad Soyad</label>
+            <input type="text" class="form-control" formControlName="fullName" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">E-posta</label>
+            <input type="email" class="form-control" formControlName="email" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Telefon</label>
+            <input type="text" class="form-control" formControlName="phone" />
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">
+            Kaydet
+          </button>
+        </form>
+
+        <div class="mt-5">
+          <label class="form-label">Avatar Yükle</label>
+          <div class="d-flex align-items-center">
+            <div class="symbol symbol-100px me-5">
+              <img *ngIf="avatarPreview; else noAvatar" [src]="avatarPreview" class="img-fluid rounded" />
+              <ng-template #noAvatar>
+                <div class="symbol-label bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">?</div>
+              </ng-template>
+            </div>
+            <div>
+              <input type="file" class="form-control mb-2" (change)="onAvatarSelected($event)" />
+              <button type="button" class="btn btn-light-danger" (click)="removeAvatar()">Avatarı Kaldır</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card mb-5">
+      <div class="card-header">
+        <h3 class="fw-bolder">Şifreyi Değiştir</h3>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="mb-3">
+            <label class="form-label">Eski Şifre</label>
+            <input type="password" class="form-control" formControlName="currentPassword" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Yeni Şifre</label>
+            <input type="password" class="form-control" formControlName="newPassword" />
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">
+            Güncelle
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="fw-bolder">PIN</h3>
+      </div>
+      <div class="card-body">
+        <form class="mb-4" [formGroup]="pinForm" (ngSubmit)="setPin()">
+          <div class="mb-3">
+            <label class="form-label">PIN Ayarla</label>
+            <input type="password" maxlength="4" class="form-control" formControlName="pin" />
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="pinForm.invalid">Kaydet</button>
+        </form>
+
+        <form [formGroup]="verifyPinForm" (ngSubmit)="verifyPin()">
+          <div class="mb-3">
+            <label class="form-label">PIN Doğrula</label>
+            <input type="password" maxlength="4" class="form-control" formControlName="pin" />
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="verifyPinForm.invalid">Doğrula</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
