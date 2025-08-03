@@ -31,19 +31,18 @@
 
   <div class="separator my-2"></div>
 
+  <!-- Profil bağlantısı -->
   <div class="menu-item px-5">
-    <a routerLink="/crafted/pages/profile" class="menu-link px-5">
-      Profilim
-    </a>
+    <a class="dropdown-item px-5" [routerLink]="['/profile']">Profilim</a>
   </div>
 
-  <div class="menu-item px-5 my-1">
-    <a routerLink="/crafted/account/settings" class="menu-link px-5">
-      Hesap Ayarları
-    </a>
+  <!-- Şifre değiştirme bağlantısı -->
+  <div class="menu-item px-5">
+    <a class="dropdown-item px-5" [routerLink]="['/profile/change-password']">Şifre Değiştir</a>
   </div>
 
+  <!-- Çıkış bağlantısı -->
   <div class="menu-item px-5">
-    <a (click)="logout()" class="menu-link px-5 cursor-pointer">Çıkış Yap</a>
+    <a class="dropdown-item px-5" [routerLink]="['/auth/logout']">Çıkış Yap</a>
   </div>
 </ng-container>
