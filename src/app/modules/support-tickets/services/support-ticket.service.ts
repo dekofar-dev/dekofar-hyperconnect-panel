@@ -13,6 +13,11 @@ export class SupportTicketService {
 
   constructor(private http: HttpClient) {}
 
+  // 🟢 Tüm destek taleplerini getir
+  getAll(): Observable<SupportTicketDto[]> {
+    return this.http.get<SupportTicketDto[]>(this.baseUrl);
+  }
+
   // 🟢 Destek taleplerini filtre ve sayfalama ile getir
   list(query: SupportTicketQuery): Observable<PagedResult<SupportTicketDto>> {
     let params = new HttpParams();
@@ -51,12 +56,22 @@ export class SupportTicketService {
     });
   }
 
+  // 🟢 Talebi kullanıcıya atamak için alternatif isim
+  assignUserToTicket(ticketId: string, userId: string): Observable<void> {
+    return this.assignUser(ticketId, userId);
+  }
+
   // 🟢 Talep durumunu güncelle
   updateStatus(ticketId: string, status: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${ticketId}/status`, {
       ticketId,
       status
     });
+  }
+
+  // 🟢 Talep durumunu güncellemek için alternatif isim
+  changeStatus(ticketId: string, status: number): Observable<void> {
+    return this.updateStatus(ticketId, status);
   }
 
   // 🟢 Talebi çözüldü olarak işaretle
@@ -85,16 +100,24 @@ export class SupportTicketService {
     );
   }
 
+  // 🟢 Destek talebini sil
+  delete(ticketId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${ticketId}`);
+  }
+
+  // 🟢 Talebi okundu olarak işaretle
   markAsRead(ticketId: string): Observable<void> {
-  return this.http.post<void>(`${this.baseUrl}/${ticketId}/read`, {});
-}
+    return this.http.post<void>(`${this.baseUrl}/${ticketId}/read`, {});
+  }
 
-update(ticketId: string, data: any): Observable<SupportTicketDto> {
-  return this.http.put<SupportTicketDto>(`${this.baseUrl}/${ticketId}`, data);
-}
+  // 🟢 Talebi güncelle
+  update(ticketId: string, data: any): Observable<SupportTicketDto> {
+    return this.http.put<SupportTicketDto>(`${this.baseUrl}/${ticketId}`, data);
+  }
 
-addNote(ticketId: string, message: string): Observable<void> {
-  return this.http.post<void>(`${this.baseUrl}/${ticketId}/note`, { message });
-}
+  // 🟢 Talebe not ekle
+  addNote(ticketId: string, message: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${ticketId}/note`, { message });
+  }
 
 }
