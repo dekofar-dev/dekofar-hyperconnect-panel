@@ -26,6 +26,11 @@ const Routing: Routes = [
     loadChildren: () =>
       import('../modules/wizards/wizards.module').then((m) => m.WizardsModule),
   },
+{
+  path: 'profile',
+  loadChildren: () =>
+    import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+},
 
   {
     path: 'crafted/widgets',
@@ -122,6 +127,12 @@ const Routing: Routes = [
         (m) => m.AdminIpModule
       ),
   },
+  {
+  path: 'work-sessions',
+  loadChildren: () =>
+    import('../modules/work-sessions/work-sessions.module').then((m) => m.WorkSessionsModule),
+},
+
   {
     path: 'pin-settings',
     loadChildren: () =>
