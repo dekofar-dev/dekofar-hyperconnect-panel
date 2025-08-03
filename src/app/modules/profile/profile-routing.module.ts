@@ -1,47 +1,14 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { OverviewComponent } from './overview/overview.component';
-import { CampaignsComponent } from './campaigns/campaigns.component';
-import { DocumentsComponent } from './documents/documents.component';
-import { ProjectsComponent } from './projects/projects.component';
+import { RouterModule, Routes } from '@angular/router';
 import { ProfileComponent } from './profile.component';
-import { ConnectionsComponent } from './connections/connections.component';
-import { ProfileSettingsComponent } from './settings/profile-settings.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 
+/** Profil modülünün yönlendirme ayarları */
 const routes: Routes = [
-  {
-    path: '',
-    component: ProfileComponent,
-    children: [
-      {
-        path: 'overview',
-        component: OverviewComponent,
-      },
-      {
-        path: 'projects',
-        component: ProjectsComponent,
-      },
-      {
-        path: 'campaigns',
-        component: CampaignsComponent,
-      },
-      {
-        path: 'documents',
-        component: DocumentsComponent,
-      },
-      {
-        path: 'connections',
-        component: ConnectionsComponent,
-      },
-      {
-        path: 'settings',
-        component: ProfileSettingsComponent,
-        // Profil ayarları sayfası
-      },
-      { path: '', redirectTo: 'overview', pathMatch: 'full' },
-      { path: '**', redirectTo: 'overview', pathMatch: 'full' },
-    ],
-  },
+  // Profil ana sayfası
+  { path: '', component: ProfileComponent },
+  // Şifre değiştirme sayfası
+  { path: 'change-password', component: ChangePasswordComponent },
 ];
 
 @NgModule({
