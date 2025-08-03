@@ -5,12 +5,11 @@ import { environment } from 'src/environments/environment';
 import { SupportTicketCreateDto, SupportTicketDto } from '../models/support-ticket.model';
 import { PagedResult } from '../models/paged-result.model';
 import { SupportTicketQuery } from '../models/support-ticket-query.model';
+import { SupportTicketReplyDto } from '../models/support-ticket-reply.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class SupportTicketService {
-  private baseUrl = `${environment.apiUrl}/SupportTickets`;
+  private baseUrl = `${environment.apiUrl}/support-tickets`;
 
   constructor(private http: HttpClient) {}
 
@@ -25,70 +24,77 @@ export class SupportTicketService {
     return this.http.get<PagedResult<SupportTicketDto>>(this.baseUrl, { params });
   }
 
-  // 🟢 Belirli talebi getir
-  getById(id: number): Observable<SupportTicketDto> {
+  // 🟢 Belirli destek talebini getir
+  getById(id: string): Observable<SupportTicketDto> {
     return this.http.get<SupportTicketDto>(`${this.baseUrl}/${id}`);
   }
 
-  // 🟢 Yeni destek talebi oluştur
+  // 🟢 Yeni destek talebi oluştur (FormData ile)
   create(data: SupportTicketCreateDto, files: File[] = []): Observable<SupportTicketDto> {
     const formData = new FormData();
-
-    // Form alanlarını forma ekle
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         formData.append(key, value.toString());
       }
     });
-
-    // Dosyaları da ekle
     files.forEach(file => {
       formData.append('attachments', file);
     });
-
     return this.http.post<SupportTicketDto>(this.baseUrl, formData);
   }
 
-  // 🟢 Talebe kullanıcı ata
-  assignUser(ticketId: number, userId: string): Observable<void> {
+  // 🟢 Talebi kullanıcıya ata
+  assignUser(ticketId: string, userId: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${ticketId}/assign`, {
+      ticketId,
       assignedToUserId: userId
     });
   }
 
   // 🟢 Talep durumunu güncelle
-  updateStatus(ticketId: number, status: number): Observable<void> {
+  updateStatus(ticketId: string, status: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${ticketId}/status`, {
+      ticketId,
       status
     });
   }
 
-  // 🟢 Talebi çözüldü olarak işaretle (status=3)
-  markAsResolved(ticketId: number): Observable<void> {
+  // 🟢 Talebi çözüldü olarak işaretle
+  markAsResolved(ticketId: string): Observable<void> {
     return this.updateStatus(ticketId, 3);
   }
 
-  // 🟢 Talebi okundu olarak işaretle
-  markAsRead(ticketId: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${ticketId}/read`, {});
+  // 🟢 Talebe yanıt gönder
+  reply(ticketId: string, message: string, files: File[] = []): Observable<SupportTicketReplyDto> {
+    const formData = new FormData();
+    formData.append('ticketId', ticketId);
+    formData.append('message', message);
+    files.forEach(file => formData.append('attachments', file));
+    return this.http.post<SupportTicketReplyDto>(`${this.baseUrl}/${ticketId}/reply`, formData);
   }
 
-  // 🟢 Talebe not ekle
-  addNote(ticketId: number, message: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${ticketId}/note`, {
-      message
-    });
+  // 🟢 Kullanıcının kendi destek taleplerini getir
+  getMyTickets(): Observable<SupportTicketDto[]> {
+    return this.http.get<SupportTicketDto[]>(`${this.baseUrl}/my`);
   }
 
-  // 🟢 Talep güncelle (durum, öncelik, kategori vb.)
-  update(ticketId: number, data: any): Observable<SupportTicketDto> {
-    return this.http.put<SupportTicketDto>(`${this.baseUrl}/${ticketId}`, data);
-  }
-
-  // 🔄 Atanabilir kullanıcıları getir (detay ekranı için opsiyonel)
+  // 🔄 Atanabilir kullanıcıları getir (detay ekranı için)
   getAssignableUsers(): Observable<{ id: string; fullName: string; email: string; role: string }[]> {
     return this.http.get<{ id: string; fullName: string; email: string; role: string }[]>(
-      `${environment.apiUrl}/Users/assignable`
+      `${environment.apiUrl}/users/assignable`
     );
   }
+
+  markAsRead(ticketId: string): Observable<void> {
+  return this.http.post<void>(`${this.baseUrl}/${ticketId}/read`, {});
+}
+
+update(ticketId: string, data: any): Observable<SupportTicketDto> {
+  return this.http.put<SupportTicketDto>(`${this.baseUrl}/${ticketId}`, data);
+}
+
+addNote(ticketId: string, message: string): Observable<void> {
+  return this.http.post<void>(`${this.baseUrl}/${ticketId}/note`, { message });
+}
+
 }

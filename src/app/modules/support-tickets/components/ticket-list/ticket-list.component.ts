@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SupportTicketService } from '../../services/support-ticket.service';
 import { SupportTicketDto } from '../../models/support-ticket.model';
@@ -21,13 +21,11 @@ export class TicketListComponent implements OnInit, OnDestroy {
   selectedStatus: number | null = null;
 
   private subs: Subscription[] = [];
-
   mode: 'my' | 'all' = 'my';
 
   constructor(
     private ticketService: SupportTicketService,
     private auth: AuthService,
-    private router: Router,
     private route: ActivatedRoute
   ) {}
 
@@ -42,9 +40,11 @@ export class TicketListComponent implements OnInit, OnDestroy {
       this.tickets = [];
       this.hasMore = true;
     }
+
     if (!this.hasMore || this.loading) return;
 
     this.loading = true;
+
     const query: SupportTicketQuery = {
       pageNumber: this.page,
       pageSize: this.pageSize,
@@ -56,10 +56,15 @@ export class TicketListComponent implements OnInit, OnDestroy {
     const sub = this.ticketService.list(query).subscribe({
       next: (res) => {
         let items = res.items;
+
+        // Eğer sadece kullanıcının kendi talepleri gösterilecekse filtrele
         if (this.mode === 'my') {
           const currentUser = this.auth.getAuthFromLocalStorage();
-          items = items.filter(t => t.createdByUserId === currentUser?.id || t.assignedToUserId === currentUser?.id);
+          items = items.filter(t =>
+            t.createdByUserId === currentUser?.id || t.assignedToUserId === currentUser?.id
+          );
         }
+
         this.tickets.push(...items);
         this.hasMore = items.length === this.pageSize;
         this.page++;
@@ -99,7 +104,7 @@ export class TicketListComponent implements OnInit, OnDestroy {
     return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
   }
 
-  // Kategori adı
+  // Kategori adı (statik ID'lere karşılık gelen açıklamalar)
   getCategoryName(category: number): string {
     const categories: { [key: number]: string } = {
       1: 'İade',
@@ -114,7 +119,7 @@ export class TicketListComponent implements OnInit, OnDestroy {
     return categories[category] || 'Bilinmeyen';
   }
 
-  // Öncelik etiketi ve rengi
+  // Öncelik etiketi ve stil sınıfı
   getPriorityInfo(priority: number | null | undefined): { label: string; class: string } {
     switch (priority) {
       case 1: return { label: 'Yüksek', class: 'text-danger fw-bold' };
@@ -124,7 +129,7 @@ export class TicketListComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Durum etiketi ve rengi
+  // Durum etiketi ve stil sınıfı
   getStatusInfo(ticket: SupportTicketDto): { label: string; class: string } {
     switch (ticket.status) {
       case 1: return { label: 'Açık', class: 'badge bg-primary' };
@@ -134,10 +139,8 @@ export class TicketListComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Etiketleri virgüle göre ayır
+  // Virgüllerle ayrılmış etiketleri diziye çevir
   getTagsArray(tags?: string): string[] {
     return tags ? tags.split(',').map(tag => tag.trim()) : [];
   }
-
-  // deprecated local filtering methods removed
 }

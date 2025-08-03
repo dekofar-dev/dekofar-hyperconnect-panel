@@ -142,17 +142,42 @@
     </div>
   </div>
 
-  <!-- Not Ekle -->
-  <div class="card mb-5" *ngIf="isAdmin || isSupport">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="card-title mb-0">Yanıt Yaz</h5>
-      <button *ngIf="ticket?.status !== 3" class="btn btn-sm btn-success" (click)="markResolved()">Çözüldü</button>
-    </div>
-    <div class="card-body">
-      <textarea class="form-control" rows="3" [(ngModel)]="noteText"></textarea>
-      <button class="btn btn-sm btn-light-primary mt-2" (click)="sendReply()" [disabled]="!noteText.trim()">Gönder</button>
-    </div>
+<!-- ... önceki içerik aynen korunur ... -->
+
+<!-- Yanıt Yaz (Admin veya Support kullanıcıları için) -->
+<div class="card mb-5" *ngIf="isAdmin || isSupport">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Yanıt Yaz</h5>
+    <button *ngIf="ticket?.status !== 3" class="btn btn-sm btn-success" (click)="markResolved()">Çözüldü</button>
   </div>
+  <div class="card-body">
+    <!-- Yanıt metni -->
+    <textarea class="form-control mb-2" rows="3" [(ngModel)]="noteText" placeholder="Yanıtınızı yazınız..."></textarea>
+
+    <!-- Dosya yükleme alanı -->
+    <input type="file" (change)="onFilesSelected($event)" class="form-control mb-2" multiple />
+
+    <!-- Seçili dosyalar -->
+    <div *ngIf="replyFiles.length > 0" class="mb-2">
+      <small class="text-muted">Yüklenecek dosyalar:</small>
+      <ul class="list-unstyled mb-0">
+        <li *ngFor="let file of replyFiles">
+          📎 {{ file.name }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Gönder butonu -->
+    <button class="btn btn-sm btn-light-primary mt-2"
+            (click)="sendReply()"
+            [disabled]="!noteText.trim() && replyFiles.length === 0">
+      Gönder
+    </button>
+  </div>
+</div>
+
+<!-- ... loading ve hata bölümleri ... -->
+
 
 </div>
 

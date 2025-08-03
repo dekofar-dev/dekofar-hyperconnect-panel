@@ -14,13 +14,17 @@ export class PinService {
     return this.http.post<void>(`${this.apiUrl}/Auth/set-pin`, { pin });
   }
 
-  verifyPin(pin: string): Observable<boolean> {
-    return this.http
-      .post<{ success: boolean }>(`${this.apiUrl}/Auth/verify-pin`, { pin })
-      .pipe(map((res) => res.success));
-  }
+verifyPin(pin: string): Observable<boolean> {
+  return this.http
+    .post(`${this.apiUrl}/account/verify-pin`, { pin }, { observe: 'response' })
+    .pipe(map((res) => res.status === 200));
+}
 
-  getPinTimeout(): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/AppSettings/pinTimeout`);
-  }
+
+getPinTimeout(): Observable<number> {
+  return this.http
+    .get<{ timeoutInMinutes: number }>(`${this.apiUrl}/account/pin-timeout`)
+    .pipe(map(res => res.timeoutInMinutes));
+}
+
 }

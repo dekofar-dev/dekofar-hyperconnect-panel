@@ -1,11 +1,26 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { SupportCategoriesRoutingModule } from './support-categories-routing.module';
-import { SupportCategoriesComponent } from './support-categories.component';
+import { SupportCategoryListComponent } from './components/support-category-list/support-category-list.component';
+import { SupportCategoryFormComponent } from './components/support-category-form/support-category-form.component';
+
+import { AgGridModule } from 'ag-grid-angular';
+import { AgCrudComponent } from '../ag-crud/ag-crud/ag-crud.component';
+import { AgCrudModule } from '../ag-crud/ag-crud/ag-crud.module';
 
 @NgModule({
-  declarations: [SupportCategoriesComponent],
-  imports: [CommonModule, FormsModule, SupportCategoriesRoutingModule]
+  declarations: [
+    SupportCategoryListComponent,
+    SupportCategoryFormComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SupportCategoriesRoutingModule,
+    AgCrudModule,
+  ]
 })
 export class SupportCategoriesModule {}

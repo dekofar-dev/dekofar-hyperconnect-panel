@@ -9,10 +9,11 @@ import { SupportTicketDto } from '../../models/support-ticket.model';
   templateUrl: './ticket-detail.component.html',
 })
 export class TicketDetailComponent implements OnInit {
-  ticketId!: number;
+  ticketId!: string;
   ticket?: SupportTicketDto;
   loading = true;
   errorMessage: string | null = null;
+
   statusOptions = [
     { id: 0, label: 'Açık' },
     { id: 1, label: 'İnceleme' },
@@ -24,11 +25,16 @@ export class TicketDetailComponent implements OnInit {
     { id: 2, label: 'Orta' },
     { id: 3, label: 'Düşük' }
   ];
+
   selectedStatus: number | null = null;
   selectedPriority: number | null = null;
+  selectedUserId: string | null = null;
+
   noteText = '';
-  assignableUsers: { id: string | number; fullName: string }[] = [];
-  selectedUserId: string | number | null = null;
+  replyFiles: File[] = [];
+
+  assignableUsers: { id: string; fullName: string }[] = [];
+
   isAdmin = false;
   isSupport = false;
   currentUserEmail: string | null = null;
@@ -48,7 +54,7 @@ export class TicketDetailComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
-        this.ticketId = +id;
+        this.ticketId = id;
         this.fetchTicketDetail();
       }
     });
@@ -67,8 +73,9 @@ export class TicketDetailComponent implements OnInit {
         this.ticket = res;
         this.selectedStatus = res.status;
         this.selectedPriority = res.priority;
-        this.selectedUserId = res.assignedToUserId || null;
+        this.selectedUserId = res.assignedToUserId?.toString() || null;
         this.loading = false;
+
         this.ticketService.markAsRead(this.ticketId).subscribe();
       },
       error: (err) => {
@@ -77,6 +84,47 @@ export class TicketDetailComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  updateTicket(): void {
+    if (!this.ticket) return;
+    const data: any = {
+      status: this.selectedStatus,
+      priority: this.selectedPriority,
+      assignedToUserId: this.selectedUserId
+    };
+    this.ticketService.update(this.ticket.id.toString(), data).subscribe({
+      next: () => alert('Güncellendi'),
+      error: () => alert('Güncellenemedi')
+    });
+  }
+
+  markResolved(): void {
+    if (!this.ticket) return;
+    this.ticketService.markAsResolved(this.ticket.id.toString()).subscribe({
+      next: () => this.fetchTicketDetail(),
+      error: () => alert('Çözüm kaydedilemedi')
+    });
+  }
+
+  sendReply(): void {
+    if (!this.ticket || (!this.noteText.trim() && this.replyFiles.length === 0)) return;
+
+    this.ticketService.reply(this.ticket.id.toString(), this.noteText, this.replyFiles).subscribe({
+      next: () => {
+        this.noteText = '';
+        this.replyFiles = [];
+        this.fetchTicketDetail();
+      },
+      error: () => alert('Yanıt gönderilemedi')
+    });
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.replyFiles = Array.from(input.files);
+    }
   }
 
   getCategoryName(category: number): string {
@@ -124,50 +172,18 @@ export class TicketDetailComponent implements OnInit {
   }
 
   hasAttachments(): boolean {
-    return !!this.ticket?.attachments && this.ticket.attachments.length > 0;
+    return !!this.ticket?.attachments?.length;
   }
 
   hasNotes(): boolean {
-    return !!this.ticket?.notes && this.ticket.notes.length > 0;
+    return !!this.ticket?.notes?.length;
   }
 
   hasLogs(): boolean {
-    return !!this.ticket?.logs && this.ticket.logs.length > 0;
+    return !!this.ticket?.logs?.length;
   }
 
   hasHistory(): boolean {
-    return !!this.ticket?.history && this.ticket.history.length > 0;
-  }
-
-  updateTicket(): void {
-    if (!this.ticket) return;
-    const data: any = {
-      status: this.selectedStatus,
-      priority: this.selectedPriority,
-      assignedToUserId: this.selectedUserId
-    };
-    this.ticketService.update(this.ticket.id, data).subscribe({
-      next: () => alert('Güncellendi'),
-      error: () => alert('Güncellenemedi')
-    });
-  }
-
-  sendReply(): void {
-    if (!this.ticket || !this.noteText.trim()) return;
-    this.ticketService.addNote(this.ticket.id, this.noteText).subscribe({
-      next: () => {
-        this.noteText = '';
-        this.fetchTicketDetail();
-      },
-      error: () => alert('Yanıt eklenemedi')
-    });
-  }
-
-  markResolved(): void {
-    if (!this.ticket) return;
-    this.ticketService.markAsResolved(this.ticket.id).subscribe({
-      next: () => this.fetchTicketDetail(),
-      error: () => alert('Güncellenemedi')
-    });
+    return !!this.ticket?.history?.length;
   }
 }
