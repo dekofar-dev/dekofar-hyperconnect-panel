@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+
+
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.4" />
+                <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+                        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+                        <PrivateAssets>all</PrivateAssets>
+                </PackageReference>
+                <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+                <PackageReference Include="Bogus" Version="35.0.1" />
+        </ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\Dekofar.HyperConnect.Application\Dekofar.HyperConnect.Application.csproj" />
+		<ProjectReference Include="..\Dekofar.HyperConnect.Domain\Dekofar.HyperConnect.Domain.csproj" />
+		<ProjectReference Include="..\Dekofar.HyperConnect.Integrations\Dekofar.HyperConnect.Integrations.csproj" />
+	</ItemGroup>
+
+</Project>
