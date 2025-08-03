@@ -1,1 +1,6 @@
 <h1>Profil Sayfası</h1>
+<div *ngIf="isOnline; else offline" class="mb-3 text-success">Çevrim içi</div>
+<ng-template #offline>
+  <div class="mb-3 text-muted">Son görülme: {{ lastSeen | date:'short' }}</div>
+</ng-template>
+<div class="mb-3">Okunmamış mesaj: {{ unreadMessageCount }}</div>

@@ -23,13 +23,15 @@ namespace Dekofar.API.Controllers
         private readonly IFileStorageService _fileStorageService;
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IApplicationDbContext _context;
+        private readonly IUserNotificationService _notificationService;
 
-        public UserMessagesController(IMediator mediator, IFileStorageService fileStorageService, IHubContext<ChatHub> hubContext, IApplicationDbContext context)
+        public UserMessagesController(IMediator mediator, IFileStorageService fileStorageService, IHubContext<ChatHub> hubContext, IApplicationDbContext context, IUserNotificationService notificationService)
         {
             _mediator = mediator;
             _fileStorageService = fileStorageService;
             _hubContext = hubContext;
             _context = context;
+            _notificationService = notificationService;
         }
 
         [HttpGet("chat/{userId}")]
@@ -78,6 +80,9 @@ namespace Dekofar.API.Controllers
 
             await _hubContext.Clients.User(message.ReceiverId.ToString())
                 .SendAsync("ReceiveUnreadCount", unreadCount);
+
+            // Alıcıya bildirim gönder
+            await _notificationService.CreateAsync(message.ReceiverId, "Yeni mesaj alındı", "Kullanıcı size mesaj gönderdi", "message");
 
             return Ok(message);
         }
