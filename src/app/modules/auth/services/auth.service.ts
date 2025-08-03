@@ -1,9 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject, of, Subscription } from 'rxjs';
-import { map, catchError, finalize } from 'rxjs/operators';
+import { map, catchError, finalize, tap } from 'rxjs/operators';
 import { UserModel } from '../models/user.model';
 import { Router } from '@angular/router';
 import { AuthHTTPService } from './auth-http/auth-http.service';
+import { WorkSessionService } from '../../work-sessions/services/work-session.service';
 
 export type UserType = UserModel | undefined;
 
@@ -26,7 +27,8 @@ export class AuthService implements OnDestroy {
 
   constructor(
     private authHttpService: AuthHTTPService,
-    private router: Router
+    private router: Router,
+    private workSessionService: WorkSessionService
   ) {
     this.isLoadingSubject = new BehaviorSubject<boolean>(false);
     this.currentUserSubject = new BehaviorSubject<UserType>(this.getUserInfo());
@@ -46,6 +48,14 @@ export class AuthService implements OnDestroy {
           return auth.user;
         }
         return undefined;
+      }),
+      tap((user) => {
+        if (user) {
+          const sub = this.workSessionService
+            .startSession()
+            .subscribe({ error: (err) => console.error('Oturum başlatılamadı:', err) });
+          this.unsubscribe.push(sub);
+        }
       }),
       catchError((err) => {
         console.error('Giriş hatası:', err);
@@ -94,6 +104,11 @@ export class AuthService implements OnDestroy {
 
   // Oturum kapatma işlemi
   logout(): void {
+    const wsSub = this.workSessionService
+      .endSession()
+      .subscribe({ error: (err) => console.error('Oturum sonlandırılamadı:', err) });
+    this.unsubscribe.push(wsSub);
+
     const sub = this.authHttpService
       .logout()
       .pipe(
