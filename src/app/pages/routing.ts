@@ -104,6 +104,25 @@ const Routing: Routes = [
       import('../modules/users/users.module').then((m) => m.UsersModule),
   },
   {
+    path: 'roles',
+    loadChildren: () =>
+      import('../modules/roles/roles.module').then((m) => m.RolesModule),
+  },
+  {
+    path: 'permissions',
+    loadChildren: () =>
+      import('../modules/permissions/permissions.module').then(
+        (m) => m.PermissionsModule
+      ),
+  },
+  {
+    path: 'settings/admin-ip',
+    loadChildren: () =>
+      import('../modules/settings/admin-ip/admin-ip.module').then(
+        (m) => m.AdminIpModule
+      ),
+  },
+  {
     path: 'pin-settings',
     loadChildren: () =>
       import('../modules/pin-settings/pin-settings.module').then(

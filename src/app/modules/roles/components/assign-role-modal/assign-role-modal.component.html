@@ -1,0 +1,21 @@
+<div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': visible }" *ngIf="visible">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Kullanıcıya Rol Ata</h5>
+        <button type="button" class="btn-close" (click)="close.emit()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Kullanıcı ID</label>
+          <input [(ngModel)]="userId" type="text" class="form-control" />
+        </div>
+        <p class="mb-0">Rol: <strong>{{ roleName }}</strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="close.emit()">Kapat</button>
+        <button type="button" class="btn btn-primary" (click)="submit()">Ata</button>
+      </div>
+    </div>
+  </div>
+</div>

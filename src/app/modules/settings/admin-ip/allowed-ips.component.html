@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-body">
+    <div class="mb-5">
+      <input
+        type="text"
+        class="form-control form-control-sm w-auto d-inline-block me-2"
+        placeholder="IP Adresi"
+        [(ngModel)]="newIp"
+      />
+      <button class="btn btn-sm btn-primary" (click)="add()">IP Adresi Ekle</button>
+    </div>
+
+    <table class="table table-row-dashed">
+      <thead>
+        <tr>
+          <th>IP</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ip of ips">
+          <td>{{ ip.ipAddress }}</td>
+          <td>
+            <button class="btn btn-light-danger btn-sm" (click)="remove(ip.id)">Sil</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
