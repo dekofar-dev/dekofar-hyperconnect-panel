@@ -15,6 +15,7 @@ import { AppComponent } from './app.component';
 import { AuthService } from './modules/auth/services/auth.service';
 import { AuthInterceptor } from './modules/auth/services/auth.interceptor'; // 🔥 interceptor import edildi
 import { LockScreenModule } from './modules/lock-screen/lock-screen.module';
+import { WorkSessionsModule } from './modules/work-sessions/work-sessions.module';
 
 import { environment } from 'src/environments/environment';
 // #fake-start#
@@ -54,6 +55,7 @@ function appInitializer(authService: AuthService) {
     InlineSVGModule.forRoot(),
     NgbModule,
     LockScreenModule,
+    WorkSessionsModule,
   ],
   providers: [
     {
