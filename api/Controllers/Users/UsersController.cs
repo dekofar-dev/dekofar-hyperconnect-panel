@@ -29,15 +29,17 @@ namespace Dekofar.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IActivityLogger _activityLogger;
         private readonly IWorkSessionService _workSessionService;
+        private readonly INotificationService _notificationService;
 
         // MediatR bağımlılığını alan kurucu
-        public UsersController(IMediator mediator, IUserService userService, UserManager<ApplicationUser> userManager, IActivityLogger activityLogger, IWorkSessionService workSessionService)
+        public UsersController(IMediator mediator, IUserService userService, UserManager<ApplicationUser> userManager, IActivityLogger activityLogger, IWorkSessionService workSessionService, INotificationService notificationService)
         {
             _mediator = mediator;
             _userService = userService;
             _userManager = userManager;
             _activityLogger = activityLogger;
             _workSessionService = workSessionService;
+            _notificationService = notificationService;
         }
 
         // Sistemdeki tüm kullanıcıları döner
@@ -247,6 +249,8 @@ namespace Dekofar.API.Controllers
             var userId = User.GetUserId();
             if (userId == null) return Unauthorized();
             await _workSessionService.EndSessionAsync(userId.Value);
+            // Kullanıcıya çevrimdışı olduğunu bildir
+            await _notificationService.SendToUserAsync(userId.Value, "UserStatusChanged", new { isOnline = false, lastSeen = DateTime.UtcNow });
             return Ok();
         }
 
