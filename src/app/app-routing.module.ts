@@ -23,7 +23,8 @@ export const routes: Routes = [
   path: 'support-tickets',
   loadChildren: () => import('./modules/support-tickets/support-tickets.module').then(m => m.SupportTicketsModule)
 },
-  { path: 'orders', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule) }
+{ path: 'orders', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule) }
+  ,{ path: 'notifications', loadChildren: () => import('./modules/notifications/notifications.module').then(m => m.NotificationsModule) }
 
 ];
 

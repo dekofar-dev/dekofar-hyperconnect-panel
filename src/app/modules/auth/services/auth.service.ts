@@ -5,6 +5,7 @@ import { UserModel } from '../models/user.model';
 import { Router } from '@angular/router';
 import { AuthHTTPService } from './auth-http/auth-http.service';
 import { WorkSessionService } from '../../work-sessions/services/work-session.service';
+import { NotificationService } from '../../notifications/services/notification.service';
 
 export type UserType = UserModel | undefined;
 
@@ -28,7 +29,8 @@ export class AuthService implements OnDestroy {
   constructor(
     private authHttpService: AuthHTTPService,
     private router: Router,
-    private workSessionService: WorkSessionService
+    private workSessionService: WorkSessionService,
+    private notificationService: NotificationService
   ) {
     this.isLoadingSubject = new BehaviorSubject<boolean>(false);
     this.currentUserSubject = new BehaviorSubject<UserType>(this.getUserInfo());
@@ -55,6 +57,9 @@ export class AuthService implements OnDestroy {
             .startSession()
             .subscribe({ error: (err) => console.error('Oturum başlatılamadı:', err) });
           this.unsubscribe.push(sub);
+          // Bildirimler için SignalR bağlantısını başlat
+          this.notificationService.startConnection();
+          this.notificationService.loadNotifications();
         }
       }),
       catchError((err) => {
@@ -74,6 +79,9 @@ export class AuthService implements OnDestroy {
           this.setAuthToken(auth.token);
           this.setUserInfo(auth.user);
           this.currentUserSubject.next(auth.user);
+          // Bildirimler için SignalR bağlantısını başlat
+          this.notificationService.startConnection();
+          this.notificationService.loadNotifications();
           return auth.user;
         }
         return undefined;
@@ -108,6 +116,8 @@ export class AuthService implements OnDestroy {
       .endSession()
       .subscribe({ error: (err) => console.error('Oturum sonlandırılamadı:', err) });
     this.unsubscribe.push(wsSub);
+    // SignalR bağlantısını kapat
+    this.notificationService.stopConnection();
 
     const sub = this.authHttpService
       .logout()

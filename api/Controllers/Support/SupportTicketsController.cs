@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
 using Dekofar.HyperConnect.Domain.Entities;
+using Dekofar.HyperConnect.Application.Common.Interfaces;
 
 namespace Dekofar.API.Controllers
 {
@@ -21,12 +22,14 @@ namespace Dekofar.API.Controllers
         // MediatR aracısı
         private readonly IMediator _mediator;
         private readonly IHubContext<SupportHub> _hubContext;
+        private readonly IUserNotificationService _notificationService;
 
         // MediatR bağımlılığını alan kurucu
-        public SupportTicketsController(IMediator mediator, IHubContext<SupportHub> hubContext)
+        public SupportTicketsController(IMediator mediator, IHubContext<SupportHub> hubContext, IUserNotificationService notificationService)
         {
             _mediator = mediator;
             _hubContext = hubContext;
+            _notificationService = notificationService;
         }
 
         // Yeni destek talebi oluşturur
@@ -97,6 +100,8 @@ namespace Dekofar.API.Controllers
             // Policy based authorization ensures only users with the
             // CanAssignTicket permission can reach this point.
             await _mediator.Send(command);
+            // Kullanıcıya bildirim gönder
+            await _notificationService.CreateAsync(command.AssignedUserId, "Yeni destek talebi", "Yeni destek talebi size atandı", "support");
             return Ok();
         }
 

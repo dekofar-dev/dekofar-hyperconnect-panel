@@ -30,6 +30,8 @@
     data-kt-menu-flip="bottom">
     <span [inlineSVG]="'./assets/media/icons/duotune/general/gen022.svg'" class="svg-icon"
       [ngClass]="toolbarButtonIconSizeClass"></span>
+    <span *ngIf="unreadCount > 0"
+      class="bullet bullet-dot bg-danger h-6px w-6px position-absolute top-0 start-50 translate-middle"></span>
   </div>
   <app-notifications-inner></app-notifications-inner>
 </div>
