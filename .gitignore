@@ -1,52 +1,68 @@
-# Angular build outputs
+# === Angular / Node ===
 /dist/
 /out-tsc/
 /.angular/
-
-# Node modules
 /node_modules/
-
-# IDE configs
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-
-# Mac
-.DS_Store
-
-
-
-# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-# Test coverage
 /coverage/
-
-# NPM pack output
 *.tgz
+*.local.json
+*.env
+.env.*
 
-# TypeScript outputs
+# Angular build outputs
 *.js
 *.js.map
 *.d.ts
-
-# ESLint
 .eslintcache
 
-# Misc
-/.sass-cache
-/connect.lock
-.npm/
+# === ASP.NET Core ===
+bin/
+obj/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+project.lock.json
+project.fragment.lock.json
+*.dbmdl
+*.pdb
+*.mdb
+*.log
+*.ldf
+*.nupkg
+*.snupkg
+*.cache
+*.tmp
+
+# Entity Framework tools
+Migrations/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# === Visual Studio Code ===
+.vscode/
+
+# === Logs ===
+*.log
+*.bak
+*.swp
+
+# === System / OS ===
+.DS_Store
 Thumbs.db
 ehthumbs.db
-local.db
-*.local.json
 
-# Package locks (isteğe bağlı dışarıda bırakılabilir)
-package-lock.json
+# === Other ===
+local.db
+/connect.lock
+.sass-cache
+*.njsproj
+*.ntvs*
