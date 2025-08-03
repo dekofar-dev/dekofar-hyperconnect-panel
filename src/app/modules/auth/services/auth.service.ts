@@ -34,6 +34,7 @@ export class AuthService implements OnDestroy {
     this.isLoading$ = this.isLoadingSubject.asObservable();
   }
 
+  // Kullanıcı giriş işlemi
   login(email: string, password: string): Observable<UserType> {
     this.isLoadingSubject.next(true);
     return this.authHttpService.login(email, password).pipe(
@@ -47,33 +48,64 @@ export class AuthService implements OnDestroy {
         return undefined;
       }),
       catchError((err) => {
-        console.error('Login error:', err);
+        console.error('Giriş hatası:', err);
         return of(undefined);
       }),
       finalize(() => this.isLoadingSubject.next(false))
     );
   }
 
-  fetchUserFromApi(): void {
-    const sub = this.authHttpService.getProfile().subscribe({
-      next: (user) => {
-        this.setUserInfo(user);
-        this.currentUserSubject.next(user);
-      },
-      error: (err) => {
-        console.error('Profil bilgisi alınamadı:', err);
-        this.logout();
-      }
-    });
-
-    this.unsubscribe.push(sub);
+  // Yeni kullanıcı kayıt işlemi
+  register(fullName: string, email: string, password: string): Observable<UserType> {
+    this.isLoadingSubject.next(true);
+    return this.authHttpService.register(fullName, email, password).pipe(
+      map((auth) => {
+        if (auth?.token && auth?.user) {
+          this.setAuthToken(auth.token);
+          this.setUserInfo(auth.user);
+          this.currentUserSubject.next(auth.user);
+          return auth.user;
+        }
+        return undefined;
+      }),
+      catchError((err) => {
+        console.error('Kayıt hatası:', err);
+        return of(undefined);
+      }),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
   }
 
+  // Sunucudan kullanıcı profili alma
+  getProfile(): Observable<UserType> {
+    return this.authHttpService.getProfile().pipe(
+      map((user) => {
+        this.setUserInfo(user);
+        this.currentUserSubject.next(user);
+        return user;
+      }),
+      catchError((err) => {
+        console.error('Profil bilgisi alınamadı:', err);
+        this.logout();
+        return of(undefined);
+      })
+    );
+  }
+
+  // Oturum kapatma işlemi
   logout(): void {
-    localStorage.removeItem(this.authLocalStorageToken);
-    localStorage.removeItem(this.authLocalStorageUser);
-    this.currentUserSubject.next(undefined);
-    this.router.navigate(['/auth/login']);
+    const sub = this.authHttpService
+      .logout()
+      .pipe(
+        finalize(() => {
+          localStorage.removeItem(this.authLocalStorageToken);
+          localStorage.removeItem(this.authLocalStorageUser);
+          this.currentUserSubject.next(undefined);
+          this.router.navigate(['/auth/login']);
+        })
+      )
+      .subscribe({ error: (err) => console.error('Çıkış hatası:', err) });
+    this.unsubscribe.push(sub);
   }
 
   getToken(): string | null {

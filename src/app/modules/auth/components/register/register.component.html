@@ -1,0 +1,166 @@
+<!--begin::Root-->
+<div class="d-flex flex-column flex-root" id="kt_app_root">
+  <!--begin::Authentication - Kayıt -->
+  <div class="d-flex flex-column flex-lg-row flex-column-fluid">
+    <!--begin::Body-->
+    <div class="d-flex flex-center w-100 p-10">
+      <div class="card rounded-3 w-100" style="max-width: 600px">
+        <div class="card-body p-10">
+          <!--begin::Form-->
+          <form
+            class="form w-100"
+            [formGroup]="registerForm"
+            novalidate="novalidate"
+            (ngSubmit)="submit()"
+          >
+            <div class="text-center mb-11">
+              <h1 class="text-gray-900 fw-bolder mb-3">Kayıt Ol</h1>
+              <div class="text-gray-500 fw-semibold fs-6">
+                Yeni bir hesap oluşturun
+              </div>
+            </div>
+
+            <ng-container *ngIf="!hasError">
+              <div class="mb-10 bg-light-info p-8 rounded">
+                <div class="text-info">
+                  Devam etmek için bilgilerinizi girin.
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="hasError">
+              <div class="mb-lg-15 alert alert-danger">
+                <div class="alert-text font-weight-bold">
+                  {{ errorMessage || 'Kayıt sırasında hata oluştu' }}
+                </div>
+              </div>
+            </ng-container>
+
+            <div class="fv-row mb-8">
+              <label class="form-label fs-6 fw-bolder text-gray-900">Ad Soyad</label>
+              <input
+                class="form-control bg-transparent"
+                type="text"
+                formControlName="fullName"
+                autocomplete="off"
+                [ngClass]="{
+                  'is-invalid':
+                    registerForm.controls['fullName'].invalid &&
+                    (registerForm.controls['fullName'].dirty ||
+                      registerForm.controls['fullName'].touched),
+                  'is-valid': registerForm.controls['fullName'].valid
+                }"
+              />
+              <ng-container
+                [ngTemplateOutlet]="formError"
+                [ngTemplateOutletContext]="{
+                  validation: 'required',
+                  message: 'Ad soyad gereklidir',
+                  control: registerForm.controls['fullName']
+                }"
+              ></ng-container>
+            </div>
+
+            <div class="fv-row mb-8">
+              <label class="form-label fs-6 fw-bolder text-gray-900">E-Posta</label>
+              <input
+                class="form-control bg-transparent"
+                type="email"
+                formControlName="email"
+                autocomplete="off"
+                [ngClass]="{
+                  'is-invalid':
+                    registerForm.controls['email'].invalid &&
+                    (registerForm.controls['email'].dirty ||
+                      registerForm.controls['email'].touched),
+                  'is-valid': registerForm.controls['email'].valid
+                }"
+              />
+              <ng-container
+                [ngTemplateOutlet]="formError"
+                [ngTemplateOutletContext]="{
+                  validation: 'required',
+                  message: 'E-posta gereklidir',
+                  control: registerForm.controls['email']
+                }"
+              ></ng-container>
+            </div>
+
+            <div class="fv-row mb-3">
+              <label class="form-label fw-bolder text-gray-900 fs-6 mb-0"
+                >Şifre</label
+              >
+              <input
+                class="form-control bg-transparent"
+                type="password"
+                formControlName="password"
+                autocomplete="off"
+                [ngClass]="{
+                  'is-invalid':
+                    registerForm.controls['password'].invalid &&
+                    (registerForm.controls['password'].dirty ||
+                      registerForm.controls['password'].touched),
+                  'is-valid': registerForm.controls['password'].valid
+                }"
+              />
+              <ng-container
+                [ngTemplateOutlet]="formError"
+                [ngTemplateOutletContext]="{
+                  validation: 'required',
+                  message: 'Şifre gereklidir',
+                  control: registerForm.controls['password']
+                }"
+              ></ng-container>
+            </div>
+
+            <div class="d-grid mb-10">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="registerForm.invalid"
+              >
+                <ng-container *ngIf="isLoading$ | async">
+                  <span class="indicator-progress" [style.display]="'block'">
+                    Lütfen bekleyin...
+                    <span
+                      class="spinner-border spinner-border-sm align-middle ms-2"
+                    ></span>
+                  </span>
+                </ng-container>
+                <ng-container *ngIf="(isLoading$ | async) === false">
+                  <span class="indicator-label">Kayıt Ol</span>
+                </ng-container>
+              </button>
+            </div>
+
+            <div class="text-gray-500 text-center fw-semibold fs-6">
+              Zaten hesabınız var mı?
+              <a routerLink="/auth/login" class="link-primary">Giriş Yap</a>
+            </div>
+          </form>
+          <!--end::Form-->
+        </div>
+      </div>
+    </div>
+    <!--end::Body-->
+  </div>
+  <!--end::Authentication - Kayıt-->
+</div>
+
+<!--begin::Form Error Template-->
+<ng-template
+  #formError
+  let-control="control"
+  let-message="message"
+  let-validation="validation"
+>
+  <ng-container
+    *ngIf="control.hasError(validation) && (control.dirty || control.touched)"
+  >
+    <div class="fv-plugins-message-container">
+      <span role="alert">{{ message }}</span>
+    </div>
+  </ng-container>
+</ng-template>
+<!--end::Form Error Template-->
+

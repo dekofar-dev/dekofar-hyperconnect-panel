@@ -1,0 +1,13 @@
+<div class="card">
+  <div class="card-body">
+    <h3 class="mb-4">Profil</h3>
+    <div *ngIf="user">
+      <p><strong>Ad Soyad:</strong> {{ user.fullName }}</p>
+      <p><strong>E-Posta:</strong> {{ user.email }}</p>
+    </div>
+    <div *ngIf="!user">
+      <span>Bilgiler yükleniyor...</span>
+    </div>
+  </div>
+</div>
+
