@@ -19,12 +19,6 @@ export const routes: Routes = [
   loadChildren: () =>
     import('./_metronic/layout/layout.module').then((m) => m.LayoutModule),
 },
-{
-  path: 'support-tickets',
-  loadChildren: () => import('./modules/support-tickets/support-tickets.module').then(m => m.SupportTicketsModule)
-},
-  { path: 'orders', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule) }
-
 ];
 
 @NgModule({

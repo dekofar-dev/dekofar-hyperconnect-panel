@@ -57,6 +57,7 @@
   </ng-container>
 </ng-container>
 <!-- Destek Talepleri -->
+<!-- Destek Talepleri Menüsü -->
 <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
@@ -65,24 +66,29 @@
     <span class="menu-title">Destek Talepleri</span>
     <span class="menu-arrow"></span>
   </span>
+
   <div class="menu-sub menu-sub-accordion">
+    <!-- Herkes görebilir -->
     <div class="menu-item">
       <a class="menu-link" routerLink="/support-tickets/my" routerLinkActive="active">
         <span class="menu-title">Taleplerim</span>
       </a>
     </div>
-    <div class="menu-item" *ngIf="userRole === 'Admin'">
+
+    <div class="menu-item">
       <a class="menu-link" routerLink="/support-tickets/all" routerLinkActive="active">
         <span class="menu-title">Tüm Talepler</span>
       </a>
     </div>
-    <div class="menu-item" *ngIf="userRole === 'Admin'">
+
+    <div class="menu-item">
       <a class="menu-link" routerLink="/support-categories" routerLinkActive="active">
         <span class="menu-title">Destek Kategorileri</span>
       </a>
     </div>
   </div>
 </div>
+
 
 <!-- User Management -->
 <div class="menu-item menu-accordion" data-kt-menu-trigger="click" *ngIf="userRole === 'Admin'">
