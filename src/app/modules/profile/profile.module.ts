@@ -9,6 +9,8 @@ import { ProfileRoutingModule } from './profile-routing.module';
 import { ProfileComponent } from './profile.component';
 import { ConnectionsComponent } from './connections/connections.component';
 import { UserProfileComponent } from './overview/user-profile/user-profile.component';
+import { ProfileSettingsComponent } from './settings/profile-settings.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Form modülleri
 import {
   CardsModule,
   DropdownMenusModule,
@@ -25,6 +27,7 @@ import { SharedModule } from "../../_metronic/shared/shared.module";
     DocumentsComponent,
     ConnectionsComponent,
     UserProfileComponent,
+    ProfileSettingsComponent,
   ],
   imports: [
     CommonModule,
@@ -33,7 +36,9 @@ import { SharedModule } from "../../_metronic/shared/shared.module";
     DropdownMenusModule,
     WidgetsModule,
     CardsModule,
-    SharedModule
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
 })
 export class ProfileModule {}

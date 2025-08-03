@@ -6,6 +6,7 @@ import { DocumentsComponent } from './documents/documents.component';
 import { ProjectsComponent } from './projects/projects.component';
 import { ProfileComponent } from './profile.component';
 import { ConnectionsComponent } from './connections/connections.component';
+import { ProfileSettingsComponent } from './settings/profile-settings.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,11 @@ const routes: Routes = [
       {
         path: 'connections',
         component: ConnectionsComponent,
+      },
+      {
+        path: 'settings',
+        component: ProfileSettingsComponent,
+        // Profil ayarları sayfası
       },
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
       { path: '**', redirectTo: 'overview', pathMatch: 'full' },
