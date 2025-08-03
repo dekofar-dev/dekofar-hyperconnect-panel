@@ -1,0 +1,28 @@
+<div class="card">
+  <div class="card-body">
+    <div class="mb-5 d-flex align-items-center">
+      <input
+        type="number"
+        class="form-control form-control-sm w-auto me-2"
+        placeholder="Rol ID"
+        [(ngModel)]="roleId"
+      />
+      <button class="btn btn-sm btn-primary" (click)="assign()">İzin Ata</button>
+    </div>
+
+    <table class="table table-row-dashed">
+      <thead>
+        <tr>
+          <th>İzin</th>
+          <th>Seç</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of permissions">
+          <td>{{ p.name }}</td>
+          <td><input type="checkbox" [(ngModel)]="selected[p.name]" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

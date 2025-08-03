@@ -1,0 +1,38 @@
+<div class="card">
+  <div class="card-body">
+    <div class="mb-5">
+      <input
+        type="text"
+        class="form-control form-control-sm w-auto d-inline-block me-2"
+        placeholder="Rol Adı"
+        [(ngModel)]="newRole"
+      />
+      <button class="btn btn-sm btn-primary" (click)="addRole()">Rol Ekle</button>
+    </div>
+
+    <table class="table table-row-dashed">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let role of roles">
+          <td>{{ role.name }}</td>
+          <td>
+            <button class="btn btn-light-primary btn-sm" (click)="openAssignModal(role)">Kullanıcıya Rol Ata</button>
+            <button class="btn btn-light-danger btn-sm ms-2" (click)="deleteRole(role.id)">Sil</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-assign-role-modal
+  [visible]="modalVisible"
+  [roleName]="selectedRoleName"
+  (close)="modalVisible = false"
+  (assign)="handleAssign($event)"
+></app-assign-role-modal>
