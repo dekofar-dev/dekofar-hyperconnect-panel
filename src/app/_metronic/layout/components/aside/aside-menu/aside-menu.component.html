@@ -28,6 +28,34 @@
     <span class="menu-title">PIN Ayarları</span>
   </a>
 </div>
+
+<!-- Dinamik olarak oluşturulan menü bölümleri -->
+<ng-container *ngFor="let section of menuSections">
+  <div class="menu-content pt-8 pb-2">
+    <span class="menu-section text-muted text-uppercase fs-8 ls-1">
+      {{ section.header }}
+    </span>
+  </div>
+
+  <!-- Her bölümdeki menü öğelerini listele -->
+  <ng-container *ngFor="let item of section.items">
+    <div
+      class="menu-item"
+      *ngIf="(!item.roles || item.roles.includes(userRole || '')) && !(item.onlyGuests && isLoggedIn)"
+    >
+      <a
+        class="menu-link without-sub"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+      >
+        <span class="menu-icon">
+          <i class="bi bi-{{ item.icon }} fs-2"></i>
+        </span>
+        <span class="menu-title">{{ item.title }}</span>
+      </a>
+    </div>
+  </ng-container>
+</ng-container>
 <!-- Destek Talepleri -->
 <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
   <span class="menu-link">

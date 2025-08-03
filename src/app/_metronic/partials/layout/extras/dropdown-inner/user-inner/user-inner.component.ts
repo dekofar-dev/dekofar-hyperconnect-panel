@@ -20,9 +20,7 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     this.user$ = this.auth.currentUser$;
   }
 
-  logout() {
-    this.auth.logout();
-  }
+  // Çıkış işlemi LogoutComponent üzerinden yapılır
 
   getInitials(firstname?: string, lastname?: string): string {
     const first = firstname?.charAt(0)?.toUpperCase() ?? '';
