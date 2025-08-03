@@ -44,6 +44,7 @@ export class AsideMenuComponent implements OnInit {
       header: 'Hesabım', // Kullanıcıya özel işlemler
       items: [
         { title: 'Profilim', icon: 'person', route: '/profile' },
+        { title: 'Bildirimler', icon: 'bell', route: '/notifications' },
         { title: 'Giriş Yap', icon: 'lock', route: '/auth/login', onlyGuests: true },
       ],
     },

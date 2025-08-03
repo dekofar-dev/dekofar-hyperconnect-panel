@@ -1,0 +1,15 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Yeni Bildirimler</h3>
+  </div>
+  <div class="card-body">
+    <div *ngIf="(notifications$ | async) as notifs">
+      <div *ngIf="notifs.length === 0" class="text-muted">Bildirim yok</div>
+      <div *ngFor="let n of notifs" class="mb-4">
+        <div class="fw-bold">{{ n.title }}</div>
+        <div class="text-muted fs-7">{{ n.message }}</div>
+        <div class="fs-8 text-gray-500">{{ n.createdAt | date:'short' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
