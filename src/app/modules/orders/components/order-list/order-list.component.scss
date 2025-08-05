@@ -1,0 +1,84 @@
+// Shopify özel renk tanımları
+.bg-purple {
+  background-color: #6f42c1 !important; // mor
+  color: #fff !important;
+}
+
+.badge-light-purple {
+  background-color: #f3e8ff !important;
+  color: #6f42c1 !important;
+  border: 1px solid #e0ccff;
+}
+
+// Metronic'e özel mevcut sınıfların varsa override etmeden tanımlama yapılabilir.
+// Yedek sınıflar (gerekirse kendi renk kodlarını özelleştirebilirsin)
+.badge-light-dark {
+  background-color: #ced4da !important;
+  color: #343a40 !important;
+  border: 1px solid #adb5bd;
+}
+
+.badge-light-danger {
+  background-color: #ffe5e5 !important;
+  color: #f1416c !important;
+}
+
+.badge-light-success {
+  background-color: #e8fff3 !important;
+  color: #50cd89 !important;
+}
+
+.badge-light-primary {
+  background-color: #e1f0ff !important;
+  color: #009ef7 !important;
+}
+
+.badge-light-warning {
+  background-color: #fff8dd !important;
+  color: #ffc700 !important;
+}
+
+.badge-light {
+  background-color: #f5f8fa !important;
+  color: #7e8299 !important;
+}
+
+// Arka plan avatar renkleri
+.bg-primary {
+  background-color: #009ef7 !important;
+  color: #fff !important;
+}
+.bg-success {
+  background-color: #50cd89 !important;
+  color: #fff !important;
+}
+.bg-danger {
+  background-color: #f1416c !important;
+  color: #fff !important;
+}
+.bg-dark {
+  background-color: #181c32 !important;
+  color: #fff !important;
+}
+.bg-warning {
+  background-color: #ffc700 !important;
+  color: #fff !important;
+}
+.bg-secondary {
+  background-color: #e4e6ef !important;
+  color: #3f4254 !important;
+}
+.bg-light {
+  background-color: #f5f8fa !important;
+  color: #7e8299 !important;
+}
+.bg-purple {
+  background-color: #6f42c1 !important;
+  color: #fff !important;
+}
+.badge-light-purple {
+  background-color: #f3e8ff !important;
+  color: #6f42c1 !important;
+  border: 1px solid #e0ccff;
+}
+

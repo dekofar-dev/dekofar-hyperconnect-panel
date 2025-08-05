@@ -2,15 +2,11 @@
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
   <!--begin::Container-->
   <div class="container-fluid px-0" id="kt_content_container">
-
-    <!--begin::Products-->
+    <!--begin::Orders-->
     <div class="card card-flush w-100 rounded-0">
-
       <!--begin::Card header-->
       <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-        <!--begin::Card title-->
         <div class="card-title">
-          <!--begin::Search-->
           <div class="d-flex align-items-center position-relative my-1">
             <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
               <span class="path1"></span>
@@ -21,40 +17,36 @@
               [(ngModel)]="searchQuery"
               (ngModelChange)="onSearchInputChange()"
               class="form-control form-control-solid w-250px ps-12"
-              placeholder="Sipariş, müşteri, e-posta veya telefon ile ara" />
+              placeholder="Sipâriş, müşteri, e-posta veya telefon ile ara" />
           </div>
-          <!--end::Search-->
         </div>
-        <!--end::Card title-->
 
-        <!--begin::Card toolbar-->
         <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
           <div class="w-100 mw-150px">
-            <select class="form-select form-select-solid" [(ngModel)]="paymentFilter">
-              <option value="">Ödeme Durumu</option>
-              <option value="paid">Ödendi</option>
+            <select class="form-select form-select-solid"
+                    [(ngModel)]="currentFilter"
+                    (ngModelChange)="applyFilter()"
+                    data-control="select2"
+                    data-hide-search="true"
+                    data-placeholder="Durum">
+              <option value="all">Tümü</option>
               <option value="pending">Beklemede</option>
-              <option value="refunded">İade</option>
-              <option value="voided">İptal</option>
-            </select>
-          </div>
-          <div class="w-100 mw-150px">
-            <select class="form-select form-select-solid" [(ngModel)]="fulfillmentFilter">
-              <option value="">Gönderim Durumu</option>
-              <option value="fulfilled">Gönderildi</option>
-              <option value="unfulfilled">Beklemede</option>
-              <option value="cancelled">İptal</option>
+              <option value="completed">Tamamlandı</option>
+              <option value="cancelled">İptal Edildi</option>
+              <option value="manual">Yalnızca Manuel</option>
             </select>
           </div>
           <a routerLink="/orders/create" class="btn btn-primary">Toplu Barkod Oluştur</a>
         </div>
-        <!--end::Card toolbar-->
       </div>
       <!--end::Card header-->
 
       <!--begin::Card body-->
       <div class="card-body pt-0">
-        <table class="table align-middle table-row-dashed fs-6 gy-5">
+        <div *ngIf="isLoading" class="text-center text-muted my-4">⏳ Siparişler yükleniyor...</div>
+        <div *ngIf="hasError" class="text-center text-danger my-4">❌ Siparişler alınırken hata oluştu.</div>
+
+        <table class="table align-middle table-row-dashed fs-6 gy-5 table-hover-highlight" *ngIf="filteredOrders.length > 0" #ordersTable>
           <thead>
             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
               <th class="text-start w-10px pe-2">
@@ -67,113 +59,70 @@
               <th class="text-end min-w-100px">Durum</th>
               <th class="text-end min-w-100px">Tutar</th>
               <th class="text-end min-w-100px">Oluşturulma</th>
-              <th class="text-end min-w-100px">Gönderim</th>
+              <th class="text-end min-w-100px">Kaynak</th>
             </tr>
           </thead>
           <tbody class="fw-semibold text-gray-600">
-            <tr *ngFor="let order of filteredOrders" (click)="goToOrder(order.id)" style="cursor: pointer;" class="hover-bg-light">
+            <tr *ngFor="let order of filteredOrders" (click)="goToOrder(order.id)">
               <td class="text-start">
                 <div class="form-check form-check-sm form-check-custom form-check-solid">
                   <input class="form-check-input" type="checkbox" />
                 </div>
               </td>
-
-              <!-- Müşteri Adı ve Avatar -->
+              <!-- Avatar + Müşteri İsmi -->
               <td>
                 <div class="d-flex align-items-center">
                   <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                    <div
-                      class="symbol-label text-white fw-bold"
-                      [ngClass]="{
-                        'bg-primary': order.financial_status === 'pending',
-                        'bg-purple': order.financial_status === 'paid',
-                        'bg-danger': order.financial_status === 'refunded',
-                        'bg-secondary': order.financial_status === 'voided'
-                      }"
-                    >
-                      {{ (order.customer?.first_name || 'M')[0] }}{{ (order.customer?.last_name || '')[0] || '' }}
+                    <div class="symbol-label text-white fw-bold" [ngClass]="getAvatarBgClass(order)">
+                      {{ (order.customerName || 'M')[0] }}
                     </div>
                   </div>
                   <div class="ms-5">
-                    <a
-                      [routerLink]="['/orders/detail', order.id]"
-                      (click)="$event.stopPropagation()"
-                      class="text-hover-primary text-gray-800 fs-5 fw-bold"
-                    >
-                      {{ order.customer?.first_name }} {{ order.customer?.last_name }}
+                    <a class="text-hover-primary text-gray-800 fs-5 fw-bold" (click)="$event.stopPropagation()">
+                      {{ order.customerName || 'Anonim' }}
                     </a>
                   </div>
                 </div>
               </td>
-
-              <!-- Sipariş Numarası -->
-              <td class="text-start fw-bold">#{{ order.order_number }}</td>
-
-              <!-- Ödeme Durumu -->
+              <td class="text-end fw-bold">#{{ order.orderNumber }}</td>
               <td class="text-end">
-                <div
-                  class="badge"
-                  [ngClass]="{
-                    'badge-light-primary': order.financial_status === 'pending',
-                    'badge-light-purple': order.financial_status === 'paid',
-                    'badge-light-danger': order.financial_status === 'refunded',
-                    'badge-light-secondary': order.financial_status === 'voided'
-                  }"
-                >
+                <span class="badge" [ngClass]="getBadgeClass(order)">
                   {{
-                    order.financial_status === 'paid' ? 'Ödendi' :
-                    order.financial_status === 'pending' ? 'Beklemede' :
-                    order.financial_status === 'voided' ? 'İptal Edildi' :
-                    order.financial_status === 'refunded' ? 'İade Edildi' :
-                    order.financial_status || 'Bilinmiyor'
-                  }}
-                </div>
-              </td>
-
-              <!-- Tutar -->
-              <td class="text-end">
-                <span class="fw-bold">{{ order.total_price }} {{ order.currency }}</span>
-              </td>
-
-              <!-- Tarih -->
-              <td class="text-end">
-                <span class="fw-bold">{{ order.created_at | date:'dd/MM/yyyy' }}</span>
-              </td>
-
-              <!-- Gönderim Durumu -->
-              <td class="text-end">
-                <span
-                  class="badge"
-                  [ngClass]="{
-                    'badge-light-success': order.fulfillment_status === 'fulfilled',
-                    'badge-light-warning': order.fulfillment_status === 'unfulfilled',
-                    'badge-light-secondary': order.fulfillment_status === 'cancelled'
-                  }"
-                >
-                  {{
-                    order.fulfillment_status === 'fulfilled' ? 'Teslim Edildi' :
-                    order.fulfillment_status === 'unfulfilled' ? 'Gönderilmedi' :
-                    order.fulfillment_status === 'cancelled' ? 'İptal Edildi' :
-                    order.fulfillment_status || '-'
+                    order.status === 'completed' ? 'Tamamlandı' :
+                    order.status === 'pending' ? 'Beklemede' :
+                    order.status === 'cancelled' ? 'İptal Edildi' :
+                    order.status === 'paid' ? 'Ödendi' :
+                    order.status === 'delivered' ? 'Teslim Edildi' :
+                    order.status === 'refunded' ? 'İade Edildi' :
+                    order.status === 'partially_refunded' ? 'Kısmi İade' :
+                    order.status === 'unfulfilled' ? 'Hazırlanıyor' :
+                    order.status || '-'
                   }}
                 </span>
               </td>
+              <td class="text-end fw-bold">{{ order.totalAmount }} {{ order.currency }}</td>
+              <td class="text-end">{{ getFormattedDate(order.createdAt) }}</td>
+              <td class="text-end">{{ getSourceLabel(order) }}</td>
             </tr>
           </tbody>
         </table>
+
+        <div *ngIf="!isLoading && filteredOrders.length === 0" class="text-center text-muted my-10">
+          Hiç sipariş bulunamadı.
+        </div>
+
+        <div class="d-flex justify-content-between mt-5">
+          <button class="btn btn-light" [disabled]="!previousPageInfo" (click)="loadPreviousPage()">⬅️ Önceki</button>
+          <button class="btn btn-light" [disabled]="!nextPageInfo" (click)="loadNextPage()">Sonraki ➔️</button>
+        </div>
       </div>
       <!--end::Card body-->
-
     </div>
-    <!--end::Products-->
+    <!--end::Orders-->
 
-    <!-- Daha Fazla Yükle Butonu -->
     <div class="text-center my-5" *ngIf="nextPageInfo && !searchResults">
-      <button class="btn btn-primary px-5 py-2 fw-bold w-100" (click)="loadMore()">
-        ⬇️ Daha Fazla Yükle
-      </button>
+      <button class="btn btn-primary px-5 py-2 fw-bold w-100" (click)="loadMore()">⬇️ Daha Fazla Yükle</button>
     </div>
-
   </div>
   <!--end::Container-->
 </div>

@@ -1,104 +1,181 @@
 import { Component, OnInit } from '@angular/core';
-import { OrdersService } from '../../services/orders.service';
-import { Order } from '../../model/shopfy/order.model';
 import { Router } from '@angular/router';
+import { OrderService } from '../../services/order.service';
+import { OrderModel } from '../../models/order.model';
 
 @Component({
   selector: 'app-order-list',
   templateUrl: './order-list.component.html',
-  styleUrls: ['./order-list.component.scss'],
 })
 export class OrderListComponent implements OnInit {
-  confirmedOrders: Order[] = [];
-  nextPageInfo: string | null = null;
-  isLoading: boolean = false;
-  hasError: boolean = false;
-
-  // 🔍 Arama özellikleri
+  orders: OrderModel[] = [];
+  filteredOrders: OrderModel[] = [];
+  currentFilter: string = 'all';
   searchQuery: string = '';
-  searchResults: Order[] | null = null;
-  searchTimeout: any = null;
-  paymentFilter: string = '';
-  fulfillmentFilter: string = '';
+  isLoading = false;
+  hasError = false;
 
-  constructor(private shopifyService: OrdersService, private router: Router) {}
+  nextPageInfo?: string;
+  previousPageInfo?: string;
+  currentPageInfo?: string;
+  searchResults: boolean = false;
+
+  readonly pageSize: number = 20;
+
+  constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
-  // ✅ Normal siparişleri yükler (sayfalı)
-  loadOrders(): void {
+  loadOrders(pageInfo?: string, direction: 'next' | 'prev' = 'next'): void {
     this.isLoading = true;
     this.hasError = false;
 
-    this.shopifyService.getConfirmedOrdersPaged(10, this.nextPageInfo || undefined).subscribe({
+    this.orderService.getCombinedOrders(this.pageSize, pageInfo, direction).subscribe({
       next: (res) => {
-        console.log('📦 Shopify Siparişleri:', res.items);
-        this.confirmedOrders.push(...res.items);
-        this.nextPageInfo = res.nextPageInfo || null;
-
-        // 🧭 Navigasyon için ID listesi
-        const orderIds = this.confirmedOrders.map((o) => o.id);
-        localStorage.setItem('orderIdList', JSON.stringify(orderIds));
-
+        this.orders = res.items;
+        this.filteredOrders = [...this.orders];
+        this.nextPageInfo = res.nextPageInfo ?? undefined;
+        this.previousPageInfo = res.previousPageInfo ?? undefined;
+        this.currentPageInfo = pageInfo;
+        this.searchResults = false;
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('❌ Siparişler alınamadı:', err);
+      error: () => {
         this.hasError = true;
         this.isLoading = false;
       },
     });
   }
 
-  // ✅ Sayfalı olarak daha fazla sipariş yükle
-  loadMore(): void {
-    if (this.searchResults) return; // 🔍 Arama açıkken sayfa yüklenmez
-    if (this.nextPageInfo && !this.isLoading) {
-      this.loadOrders();
+  loadNextPage(): void {
+    if (this.nextPageInfo) {
+      this.loadOrders(this.nextPageInfo, 'next');
     }
   }
 
-  get filteredOrders(): Order[] {
-    const list = this.searchResults || this.confirmedOrders;
-    return list.filter(o =>
-      (this.paymentFilter ? o.financial_status === this.paymentFilter : true) &&
-      (this.fulfillmentFilter ? o.fulfillment_status === this.fulfillmentFilter : true)
-    );
+  loadPreviousPage(): void {
+    if (this.previousPageInfo) {
+      this.loadOrders(this.previousPageInfo, 'prev');
+    }
   }
 
-  // ✅ Satıra tıklayınca detay sayfasına git
-  goToOrder(orderId: number | string): void {
-    this.router.navigate(['/orders/detail', orderId]);
-  }
-
-  // 🔍 Canlı arama input değiştiğinde çalışır
   onSearchInputChange(): void {
-    clearTimeout(this.searchTimeout);
-
-    if (!this.searchQuery.trim()) {
-      // Arama kutusu temizlendi → normal listeye dön
-      this.searchResults = null;
-      this.confirmedOrders = [];
-      this.nextPageInfo = null;
-      this.loadOrders();
+    const query = this.searchQuery.trim();
+    if (!query) {
+      this.filteredOrders = [...this.orders];
+      this.searchResults = false;
       return;
     }
 
-    this.searchTimeout = setTimeout(() => {
-      this.shopifyService.searchOrders(this.searchQuery).subscribe({
-        next: (results) => {
-          this.searchResults = results;
+    this.isLoading = true;
+    this.orderService.searchOrders(query).subscribe({
+      next: (results) => {
+        this.filteredOrders = results;
+        this.searchResults = true;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Arama hatası', err);
+        this.filteredOrders = [];
+        this.searchResults = true;
+        this.isLoading = false;
+      }
+    });
+  }
 
-          // Navigasyon listesi güncelle
-          const orderIds = results.map((o) => o.id);
-          localStorage.setItem('orderIdList', JSON.stringify(orderIds));
-        },
-        error: () => {
-          this.searchResults = [];
-        },
-      });
-    }, 400); // Debounce
+  applyFilter(): void {
+    if (this.currentFilter === 'all') {
+      this.filteredOrders = [...this.orders];
+    } else if (this.currentFilter === 'manual') {
+      this.filteredOrders = this.orders.filter(
+        (order) => order.source === 'Manual'
+      );
+    } else {
+      this.filteredOrders = this.orders.filter(
+        (order) => order.status?.toLowerCase() === this.currentFilter.toLowerCase()
+      );
+    }
+  }
+
+  getShopifyBadgeClass(order: OrderModel): string {
+    const status = (order.status || '').toLowerCase();
+    switch (status) {
+      case 'pending': return 'badge-light-primary';
+      case 'paid': return 'badge-light-purple';
+      case 'delivered': return 'badge-light-success';
+      case 'cancelled': return 'badge-light-dark';
+      case 'refunded': return 'badge-light-danger';
+      case 'partially_refunded': return 'badge-light-info';
+      case 'unfulfilled': return 'badge-light-warning';
+      default: return 'badge-light';
+    }
+  }
+
+  getAvatarBgClass(order: OrderModel): string {
+    const status = (order.status || '').toLowerCase();
+    switch (status) {
+      case 'pending': return 'bg-primary';
+      case 'paid': return 'bg-purple';
+      case 'delivered': return 'bg-success';
+      case 'cancelled': return 'bg-dark';
+      case 'refunded': return 'bg-danger';
+      case 'partially_refunded': return 'bg-info';
+      case 'unfulfilled': return 'bg-warning';
+      default: return 'bg-secondary';
+    }
+  }
+
+  getFormattedDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+
+    const isToday = date.toDateString() === now.toDateString();
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    const saatDakika = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+    if (isToday) return `Bugün saat ${saatDakika}`;
+    if (isYesterday) return `Dün saat ${saatDakika}`;
+    if (diffInDays < 7) {
+      const gunAdi = date.toLocaleDateString('tr-TR', { weekday: 'long' });
+      return `${gunAdi.charAt(0).toUpperCase() + gunAdi.slice(1)} saat ${saatDakika}`;
+    }
+    return `${date.toLocaleDateString('tr-TR')} saat ${saatDakika}`;
+  }
+
+  goToOrder(id: string | number): void {
+    this.router.navigate(['/orders', id.toString()]);
+  }
+
+  loadMore(): void {
+    this.loadNextPage();
+  }
+
+  getSourceLabel(order: OrderModel): string {
+    return order.source === 'Manual' ? 'Manuel' : 'Shopify';
+  }
+
+  getBadgeClass(order: OrderModel): string {
+    return order.source === 'Shopify'
+      ? this.getShopifyBadgeClass(order)
+      : this.getManualBadgeClass(order);
+  }
+
+  getManualBadgeClass(order: OrderModel): string {
+    const status = (order.status || '').toLowerCase();
+    switch (status) {
+      case 'pending':
+      case 'beklemede': return 'badge-light-warning';
+      case 'completed':
+      case 'tamamlandı': return 'badge-light-success';
+      case 'cancelled':
+      case 'iptal': return 'badge-light-danger';
+      default: return 'badge-light';
+    }
   }
 }

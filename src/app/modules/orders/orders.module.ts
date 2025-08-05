@@ -1,22 +1,25 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // <== Gerekli!
-import { FormsModule } from '@angular/forms';   // <== ngModel varsa bu da gerekli!
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'; // ✅ EKLE
+import { RouterModule } from '@angular/router';
 
 import { OrderListComponent } from './components/order-list/order-list.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
+import { ManualOrderCreateComponent } from './components/manual-order-create/manual-order-create.component'; // ✅ varsa
 import { OrdersRoutingModule } from './orders-routing.module';
 
 @NgModule({
   declarations: [
     OrderListComponent,
-    OrderDetailComponent
+    OrderDetailComponent,
+    ManualOrderCreateComponent // ✅ varsa ekle
   ],
   imports: [
     CommonModule,
-    FormsModule,
-    RouterModule,        // ✅ routerLink, routerLinkActive için
-    OrdersRoutingModule  // ✅ kendi routing modülün
+    ReactiveFormsModule, // ✅ EKLE
+    FormsModule,         // (opsiyonel ama önerilir)
+    RouterModule,
+    OrdersRoutingModule
   ]
 })
 export class OrdersModule {}

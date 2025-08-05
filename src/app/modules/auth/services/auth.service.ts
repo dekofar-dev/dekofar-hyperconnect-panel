@@ -57,9 +57,10 @@ export class AuthService implements OnDestroy {
             .startSession()
             .subscribe({ error: (err) => console.error('Oturum başlatılamadı:', err) });
           this.unsubscribe.push(sub);
-          // Bildirimler için SignalR bağlantısını başlat
-          this.notificationService.startConnection();
-          this.notificationService.loadNotifications();
+
+          // Bildirim sistemi geçici olarak devre dışı bırakıldı
+          // this.notificationService.startConnection();
+          // this.notificationService.loadNotifications();
         }
       }),
       catchError((err) => {
@@ -79,9 +80,11 @@ export class AuthService implements OnDestroy {
           this.setAuthToken(auth.token);
           this.setUserInfo(auth.user);
           this.currentUserSubject.next(auth.user);
-          // Bildirimler için SignalR bağlantısını başlat
-          this.notificationService.startConnection();
-          this.notificationService.loadNotifications();
+
+          // Bildirim sistemi geçici olarak devre dışı bırakıldı
+          // this.notificationService.startConnection();
+          // this.notificationService.loadNotifications();
+
           return auth.user;
         }
         return undefined;
@@ -116,7 +119,8 @@ export class AuthService implements OnDestroy {
       .endSession()
       .subscribe({ error: (err) => console.error('Oturum sonlandırılamadı:', err) });
     this.unsubscribe.push(wsSub);
-    // SignalR bağlantısını kapat
+
+    // Bildirim bağlantısı durduruluyor (zaten çalışmıyor ama garanti olsun)
     this.notificationService.stopConnection();
 
     const sub = this.authHttpService

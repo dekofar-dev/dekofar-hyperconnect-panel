@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { AuthService } from '../../auth/services/auth.service';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
 export interface NotificationModel {
   id: string;
@@ -15,80 +11,49 @@ export interface NotificationModel {
 }
 
 /**
- * SignalR üzerinden gerçek zamanlı bildirimleri yöneten servis
+ * Bildirim sistemi pasif sürüm (SignalR ve HTTP çağrıları kapalı)
  */
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
-  private hubConnection?: HubConnection;
+  /** Boş bildirim listesi */
   private notificationsSubject = new BehaviorSubject<NotificationModel[]>([]);
-  /** Bildirim listesine abonelik */
   notifications$: Observable<NotificationModel[]> = this.notificationsSubject.asObservable();
+
+  /** Okunmamış bildirim sayısı (hep 0) */
   private unreadCountSubject = new BehaviorSubject<number>(0);
-  /** Okunmamış bildirim sayısı */
   unreadCount$: Observable<number> = this.unreadCountSubject.asObservable();
 
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor() {}
 
   /**
-   * SignalR bağlantısını başlatır
+   * SignalR bağlantısını başlatır (devre dışı)
    */
   startConnection(): void {
-    if (this.hubConnection) return;
-    const baseUrl = environment.apiUrl.replace('/api', '');
-    this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`${baseUrl}/hubs/notification`, {
-        accessTokenFactory: () => this.auth.getToken() || ''
-      })
-      .withAutomaticReconnect()
-      .configureLogging(LogLevel.Information)
-      .build();
-
-    // Sunucudan gelen yeni bildirimleri dinle
-    this.hubConnection.on('ReceiveNotification', (notif: NotificationModel) => {
-      const current = this.notificationsSubject.getValue();
-      this.notificationsSubject.next([notif, ...current]);
-      const unread = this.unreadCountSubject.getValue() + 1;
-      this.unreadCountSubject.next(unread);
-    });
-
-    this.hubConnection
-      .start()
-      .catch(err => console.error('SignalR bağlantısı kurulamadı:', err));
-  }
-
-  /** Bağlantıyı sonlandırır */
-  stopConnection(): void {
-    this.hubConnection?.stop();
-    this.hubConnection = undefined;
+    // SignalR bağlantısı devre dışı
+    // console.log('startConnection devre dışı');
   }
 
   /**
-   * Sunucudan son bildirimleri çeker
+   * SignalR bağlantısını kapatır (devre dışı)
+   */
+  stopConnection(): void {
+    // console.log('stopConnection devre dışı');
+  }
+
+  /**
+   * Bildirimleri yükler (boş gönderir)
    */
   loadNotifications(): void {
-    this.http
-      .get<NotificationModel[]>(`${environment.apiUrl}/notifications`)
-      .subscribe(list => {
-        this.notificationsSubject.next(list);
-        const unread = list.filter(n => !n.isRead).length;
-        this.unreadCountSubject.next(unread);
-      });
+    // API çağrısı yapılmadan boş liste gönderilir
+    this.notificationsSubject.next([]);
+    this.unreadCountSubject.next(0);
   }
 
   /**
-   * Bildirimi okunmuş olarak işaretler
+   * Bildirimi okunmuş olarak işaretler (devre dışı)
    */
   markAsRead(id: string): void {
-    this.http
-      .post(`${environment.apiUrl}/notifications/${id}/read`, {})
-      .subscribe(() => {
-        const list = this.notificationsSubject.getValue().map(n =>
-          n.id === id ? { ...n, isRead: true } : n
-        );
-        this.notificationsSubject.next(list);
-        const unread = list.filter(n => !n.isRead).length;
-        this.unreadCountSubject.next(unread);
-      });
+    // Devre dışı
+    // console.log(`Bildirim ${id} okunmuş olarak işaretlendi (devre dışı).`);
   }
 }
-

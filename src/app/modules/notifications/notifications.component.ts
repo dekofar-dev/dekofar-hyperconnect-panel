@@ -14,6 +14,6 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.notifications$ = this.notificationService.notifications$;
-    this.notificationService.loadNotifications();
+    // this.notificationService.loadNotifications();
   }
 }

@@ -76,7 +76,7 @@ const Routing: Routes = [
   {
     path: 'orders',
     loadChildren: () =>
-      import('./orders/orders.module').then((m) => m.OrdersPageModule),
+      import('../modules/orders/orders.module').then((m) => m.OrdersModule),
   },
   {
     path: 'mailbox',
