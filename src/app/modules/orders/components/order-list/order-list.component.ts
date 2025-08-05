@@ -102,13 +102,13 @@ export class OrderListComponent implements OnInit {
   getShopifyBadgeClass(order: OrderModel): string {
     const status = (order.status || '').toLowerCase();
     switch (status) {
-      case 'pending': return 'badge-light-primary';
-      case 'paid': return 'badge-light-purple';
-      case 'delivered': return 'badge-light-success';
-      case 'cancelled': return 'badge-light-dark';
-      case 'refunded': return 'badge-light-danger';
-      case 'partially_refunded': return 'badge-light-info';
-      case 'unfulfilled': return 'badge-light-warning';
+      case 'tamamlandı': return 'badge-light-success';
+      case 'hazırlanıyor': return 'badge-light-warning';
+      case 'beklemede': return 'badge-light-primary';
+      case 'iptal': return 'badge-light-dark';
+      case 'iade edildi': return 'badge-light-danger';
+      case 'kısmi iade': return 'badge-light-info';
+      case 'onaylandı': return 'badge-light-purple';
       default: return 'badge-light';
     }
   }
@@ -116,13 +116,13 @@ export class OrderListComponent implements OnInit {
   getAvatarBgClass(order: OrderModel): string {
     const status = (order.status || '').toLowerCase();
     switch (status) {
-      case 'pending': return 'bg-primary';
-      case 'paid': return 'bg-purple';
-      case 'delivered': return 'bg-success';
-      case 'cancelled': return 'bg-dark';
-      case 'refunded': return 'bg-danger';
-      case 'partially_refunded': return 'bg-info';
-      case 'unfulfilled': return 'bg-warning';
+      case 'tamamlandı': return 'bg-success';
+      case 'hazırlanıyor': return 'bg-warning';
+      case 'beklemede': return 'bg-primary';
+      case 'iptal': return 'bg-dark';
+      case 'iade edildi': return 'bg-danger';
+      case 'kısmi iade': return 'bg-info';
+      case 'onaylandı': return 'bg-purple';
       default: return 'bg-secondary';
     }
   }

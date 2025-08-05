@@ -210,36 +210,56 @@ searchOrders(query: string): Observable<OrderModel[]> {
   /**
    * Shopify API'den gelen sipariş verisini OrderModel formatına dönüştürür
    */
-  private mapShopifyOrder(order: any): OrderModel {
-    return {
-      id: order.id.toString(),
-      orderNumber: order.order_number,
-      source: 'Shopify',
-      createdAt: order.created_at,
-      status: order.financial_status === 'paid'
-        ? 'Tamamlandı'
-        : order.financial_status === 'pending'
-          ? 'Beklemede'
-          : 'Bilinmiyor',
-      customerName: `${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim() || 'Shopify Müşterisi',
-      phone: order.customer?.phone,
-      email: order.customer?.email,
-      address: order.shipping_address?.address1,
-      city: order.shipping_address?.city,
-      district: order.shipping_address?.province,
-      paymentType: 'Kredi Kartı',
-      orderNote: order.note,
-      totalAmount: parseFloat(order.total_price),
-      currency: order.currency ?? 'TRY',
-      createdByAvatarUrl: undefined,
-      items: order.line_items?.map((item: any) => ({
-        productId: item.product_id,
-        productName: item.name,
-        quantity: item.quantity,
-        price: parseFloat(item.price),
-        variantId: item.variant_id,
-        variantName: item.variant_title
-      })) ?? []
-    };
+private mapShopifyOrder(order: any): OrderModel {
+  const financial = (order.financial_status || '').toLowerCase();
+  const fulfillment = (order.fulfillment_status || '').toLowerCase();
+
+  let status: string;
+
+  if (financial === 'paid' && fulfillment === 'fulfilled') {
+    status = 'Tamamlandı';
+  } else if (financial === 'paid' && fulfillment === 'unfulfilled') {
+    status = 'Hazırlanıyor';
+  } else if (financial === 'refunded') {
+    status = 'İade Edildi';
+  } else if (financial === 'partially_refunded') {
+    status = 'Kısmi İade';
+  } else if (financial === 'pending') {
+    status = 'Beklemede';
+  } else if (financial === 'authorized') {
+    status = 'Onaylandı';
+  } else if (financial === 'voided') {
+    status = 'İptal';
+  } else {
+    status = 'Bilinmiyor';
   }
+
+  return {
+    id: order.id.toString(),
+    orderNumber: order.order_number,
+    source: 'Shopify',
+    createdAt: order.created_at,
+    status: status,
+    customerName: `${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim() || 'Shopify Müşterisi',
+    phone: order.customer?.phone,
+    email: order.customer?.email,
+    address: order.shipping_address?.address1,
+    city: order.shipping_address?.city,
+    district: order.shipping_address?.province,
+    paymentType: 'Kredi Kartı',
+    orderNote: order.note,
+    totalAmount: parseFloat(order.total_price),
+    currency: order.currency ?? 'TRY',
+    createdByAvatarUrl: undefined,
+    items: order.line_items?.map((item: any) => ({
+      productId: item.product_id,
+      productName: item.name,
+      quantity: item.quantity,
+      price: parseFloat(item.price),
+      variantId: item.variant_id,
+      variantName: item.variant_title
+    })) ?? []
+  };
+}
+
 }

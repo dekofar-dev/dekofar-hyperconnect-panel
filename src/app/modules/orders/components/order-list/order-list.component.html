@@ -63,7 +63,7 @@
             </tr>
           </thead>
           <tbody class="fw-semibold text-gray-600">
-            <tr *ngFor="let order of filteredOrders" (click)="goToOrder(order.id)">
+<tr *ngFor="let order of filteredOrders" (click)="goToOrder(order.id)" style="cursor: pointer;">
               <td class="text-start">
                 <div class="form-check form-check-sm form-check-custom form-check-solid">
                   <input class="form-check-input" type="checkbox" />
@@ -86,19 +86,10 @@
               </td>
               <td class="text-end fw-bold">#{{ order.orderNumber }}</td>
               <td class="text-end">
-                <span class="badge" [ngClass]="getBadgeClass(order)">
-                  {{
-                    order.status === 'completed' ? 'Tamamlandı' :
-                    order.status === 'pending' ? 'Beklemede' :
-                    order.status === 'cancelled' ? 'İptal Edildi' :
-                    order.status === 'paid' ? 'Ödendi' :
-                    order.status === 'delivered' ? 'Teslim Edildi' :
-                    order.status === 'refunded' ? 'İade Edildi' :
-                    order.status === 'partially_refunded' ? 'Kısmi İade' :
-                    order.status === 'unfulfilled' ? 'Hazırlanıyor' :
-                    order.status || '-'
-                  }}
-                </span>
+<span class="badge" [ngClass]="getBadgeClass(order)">
+  {{ order.status || '-' }}
+</span>
+
               </td>
               <td class="text-end fw-bold">{{ order.totalAmount }} {{ order.currency }}</td>
               <td class="text-end">{{ getFormattedDate(order.createdAt) }}</td>

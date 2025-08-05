@@ -82,3 +82,8 @@
   border: 1px solid #e0ccff;
 }
 
+table.table-hover-highlight tbody tr:hover {
+  background-color: #f5f8fa !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
