@@ -16,11 +16,12 @@ export const environment = {
   supportEmail: 'destek@herdemtaze.com.tr',
 
   // Tema bilgisi
+  // Tema bilgisi
   appThemeName: 'Metronic',
-  appPurchaseUrl: 'https://1.envato.market/EA4JP',
-  appPreviewUrl: 'https://preview.keenthemes.com/metronic8/angular/demo3/',
-  appPreviewDocsUrl: 'https://preview.keenthemes.com/metronic8/angular/docs',
-  appPreviewChangelogUrl: 'https://preview.keenthemes.com/metronic8/angular/docs/changelog',
+  appPurchaseUrl: '#',
+  appPreviewUrl: '#',
+  appPreviewDocsUrl: '#',
+  appPreviewChangelogUrl: '#',
 
   // Sadece demo3 kullanılacak
   appDemos: {

@@ -8,8 +8,8 @@ export type AG = 'A' | 'G';
 export type TeslimSekli = 'AH' | 'AT' | 'TI';
 
 export interface DhlExportOptions {
-  kilo?: number;             // default 2
-  desi?: number;             // default 2
+  kilo?: number;             // default 3
+  desi?: number;             // default 5
   odemeTipi?: AG;            // default 'G'
   teslimSekli?: TeslimSekli; // default 'AT'
   kapidaTahsilat?: EH;       // default 'E'
@@ -96,8 +96,8 @@ const aciklama =
         '',                           // VERGI_DAIRESI
         firstItemName,                // KARGO_ICERIK (ürün adı)
         1,                            // ADET (sabit 1)
-        kilo,                         // KILO (sabit 2)
-        desi,                         // DESI (sabit 2)
+        kilo,                         // KILO (sabit 3)
+        desi,                         // DESI (sabit 5)
         odemeTipi,                    // ODEME_TIPI_A_G ('G')
         teslimSekli,                  // TESLIM_SEKLI_AH_AT_TI ('AT')
         aciklama,                     // ACIKLAMA

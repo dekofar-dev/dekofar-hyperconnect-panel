@@ -60,8 +60,8 @@ export class ShopifyExportComponent implements OnInit {
       this.orders(),
       `${suffix}-unfulfilled_${new Date().toISOString().slice(0, 10)}.xlsx`,
       {
-        kilo: 2,
-        desi: 2,
+        kilo: 3,
+        desi: 5,
         kapidaTahsilat: 'E', // kapıda tahsilat var
         odemeTipi: 'G',      // gönderici öder
         teslimSekli: 'AT',   // teslim şekli AT
