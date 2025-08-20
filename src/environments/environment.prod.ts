@@ -9,8 +9,8 @@ export const environment = {
   isMockEnabled: false,
 
   // Canlı API adresi
-  apiUrl: 'https://api.dekofar.com/api',
-
+  // apiUrl: 'https://api.dekofar.com/api',
+    apiUrl: 'http://localhost:5036/api',
   // Siteye özgü bilgiler
   siteName: 'Herdemtaze',
   siteDomain: 'herdemtaze.com.tr',

@@ -8,10 +8,9 @@ export const environment = {
   USERDATA_KEY: 'dekofar_user_data',
   isMockEnabled: false,
 
-  // Lokal API adresi
-    apiUrl: 'http://localhost:5036/api'
-,
-
+  // Canlı API adresi
+  // apiUrl: 'https://api.dekofar.com/api',
+    apiUrl: 'http://localhost:5036/api',
   // Siteye özgü bilgiler
   siteName: 'Herdemtaze',
   siteDomain: 'herdemtaze.com.tr',
