@@ -1,4 +1,6 @@
 <!-- Dashboard -->
+
+
 <div class="menu-item">
   <a
     class="menu-link without-sub"
@@ -13,8 +15,14 @@
     <span class="menu-title" translate="MENU.DASHBOARD"></span
   ></a>
 </div>
+
+
+
+
+
+
 <!-- PIN Ayarları -->
-<div class="menu-item">
+<div class="menu-item disabled">
   <a
     class="menu-link without-sub"
     routerLink="/pin-settings"
@@ -37,10 +45,14 @@
     </span>
   </div>
 
+
+  
+
+
   <!-- Her bölümdeki menü öğelerini listele -->
   <ng-container *ngFor="let item of section.items">
     <div
-      class="menu-item"
+      class="menu-item disabled"
       *ngIf="(!item.roles || item.roles.includes(userRole || '')) && !(item.onlyGuests && isLoggedIn)"
     >
       <a
@@ -58,7 +70,7 @@
 </ng-container>
 <!-- Destek Talepleri -->
 <!-- Destek Talepleri Menüsü -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/communication/com003.svg'" class="svg-icon svg-icon-2"></span>
@@ -69,7 +81,7 @@
 
   <div class="menu-sub menu-sub-accordion">
     <!-- Herkes görebilir -->
-    <div class="menu-item">
+    <div class="menu-item ">
       <a class="menu-link" routerLink="/support-tickets/my" routerLinkActive="active">
         <span class="menu-title">Taleplerim</span>
       </a>
@@ -90,8 +102,37 @@
 </div>
 
 
+
+<!-- Excel İşlemleri -->
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+  <span class="menu-link">
+    <span class="menu-icon">
+      <span [inlineSVG]="'./assets/media/icons/duotune/files/fil003.svg'" class="svg-icon svg-icon-2"></span>
+    </span>
+    <span class="menu-title">Excel İşlemleri</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    <div class="menu-item">
+      <a class="menu-link" routerLink="/excel-tools/shopify" routerLinkActive="active">
+        <span class="menu-title">Shopify Export</span>
+      </a>
+    </div>
+    <!-- ileride ekleyeceğin PT, DHL için alt menüler -->
+    <!--
+    <div class="menu-item">
+      <a class="menu-link" routerLink="/excel-tools/pt" routerLinkActive="active">
+        <span class="menu-title">PT Export</span>
+      </a>
+    </div>
+    -->
+  </div>
+</div>
+
+
+
 <!-- User Management -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click" *ngIf="userRole === 'Admin'">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click" *ngIf="userRole === 'Admin'">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/communication/com006.svg'" class="svg-icon svg-icon-2"></span>
@@ -109,7 +150,7 @@
 </div>
 
 <!-- Campaigns -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click" *ngIf="userRole === 'Admin'">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click" *ngIf="userRole === 'Admin'">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/general/gen025.svg'" class="svg-icon svg-icon-2"></span>
@@ -127,7 +168,7 @@
 </div>
 
 <!-- Siparişler -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/ecommerce/ecm001.svg'" class="svg-icon svg-icon-2"></span>
@@ -137,7 +178,7 @@
   </span>
   <div class="menu-sub menu-sub-accordion">
     <!-- Shopify Siparişleri -->
-    <div class="menu-item">
+    <div class="menu-item disabled">
       <a
         class="menu-link"
         [routerLink]="['/orders']"
@@ -149,7 +190,7 @@
     </div>
 
     <!-- Manuel Siparişler -->
-    <div class="menu-item">
+    <div class="menu-item disabled">
       <a
         class="menu-link"
         [routerLink]="['/orders']"
@@ -161,7 +202,7 @@
     </div>
 
     <!-- Yeni Sipariş Oluştur -->
-    <div class="menu-item">
+    <div class="menu-item disabled" >
       <a
         class="menu-link"
         [routerLink]="['/orders/create']"
@@ -176,7 +217,7 @@
 
 
 <!-- Kargo İşlemleri -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/general/gen019.svg'" class="svg-icon svg-icon-2"></span>
@@ -192,7 +233,7 @@
 </div>
 
 <!-- Müşteri Hizmetleri -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/communication/com012.svg'" class="svg-icon svg-icon-2"></span>
@@ -208,7 +249,7 @@
 </div>
 
 <!-- İadeler -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/files/fil002.svg'" class="svg-icon svg-icon-2"></span>
@@ -224,7 +265,7 @@
 </div>
 
 <!-- Finans -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/finance/fin006.svg'" class="svg-icon svg-icon-2"></span>
@@ -240,7 +281,7 @@
 </div>
 
 <!-- Komisyonlar -->
-<div class="menu-item" *ngIf="userRole === 'Admin'">
+<div class="menu-item disabled" *ngIf="userRole === 'Admin'">
   <a class="menu-link without-sub" routerLink="/commissions" routerLinkActive="active">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/finance/fin008.svg'" class="svg-icon svg-icon-2"></span>
@@ -250,7 +291,7 @@
 </div>
 
 <!-- Envanter -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled"  data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/ecommerce/ecm008.svg'" class="svg-icon svg-icon-2"></span>
@@ -265,7 +306,7 @@
 </div>
 
 <!-- Gelen Kutusu -->
-<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/communication/com006.svg'" class="svg-icon svg-icon-2"></span>

@@ -78,6 +78,11 @@ const Routing: Routes = [
     loadChildren: () =>
       import('../modules/orders/orders.module').then((m) => m.OrdersModule),
   },
+    {
+    path: 'excel-tools',
+    loadChildren: () =>
+      import('../modules/excel-tools/excel-tools.module').then((m) => m.ExcelToolsModule),
+  },
   {
     path: 'mailbox',
     loadChildren: () =>

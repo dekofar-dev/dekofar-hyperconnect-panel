@@ -1,55 +1,42 @@
+// src/app/modules/orders/services/order.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable, forkJoin, map, switchMap, of } from 'rxjs';
 import { OrderModel } from '../models/order.model';
 
-@Injectable({
-  providedIn: 'root' // Bu servis tüm uygulamada singleton olarak kullanılabilir
-})
+@Injectable({ providedIn: 'root' })
 export class OrderService {
-  private apiUrl = environment.apiUrl; // API base URL ortam değişkeninden alınır
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Shopify ve manuel siparişleri birleştirip tarih sırasına göre sıralı şekilde döner.
-   * @param limit - Shopify siparişlerinde kaç adet alınacağı
-   * @param pageInfo - Sayfalama bilgisi (Shopify için geçerli)
-   * @param direction - Sayfalama yönü (varsayılan: 'next')
+   * Shopify ve manuel siparişleri birleştirip tarih sırasına göre döner (sayfalı Shopify).
    */
   getCombinedOrders(
     limit: number,
     pageInfo?: string,
     direction: 'next' | 'prev' = 'next'
-  ): Observable<{
-    items: OrderModel[];
-    nextPageInfo?: string;
-    previousPageInfo?: string;
-  }> {
-    // Shopify siparişlerini sayfalı şekilde çek
+  ): Observable<{ items: OrderModel[]; nextPageInfo?: string; previousPageInfo?: string }> {
     const shopify$ = this.http.get<{ items: any[]; nextPageInfo?: string | null }>(
-      `${this.apiUrl}/Shopify/orders-paged?limit=${limit}${pageInfo ? `&pageInfo=${encodeURIComponent(pageInfo)}` : ''}`
+      `${this.apiUrl}/Shopify/orders-paged?limit=${limit}${
+        pageInfo ? `&pageInfo=${encodeURIComponent(pageInfo)}` : ''
+      }`
     );
 
-    // Manuel siparişleri çek
     const manual$ = this.getManualOrders();
 
-    // Her iki istek tamamlandığında işlem yap
     return forkJoin([shopify$, manual$]).pipe(
       map(([shopifyRes, manualOrders]) => {
-        // Shopify siparişlerini modele dönüştür
-        const shopifyOrders: OrderModel[] = shopifyRes.items.map((order: any) => this.mapShopifyOrder(order));
-
-        // Manuel siparişleri modele dönüştür ve ek alanları hazırla
-        const formattedManualOrders: OrderModel[] = manualOrders.map(order => ({
+        const shopifyOrders: OrderModel[] = (shopifyRes.items || []).map((o: any) => this.mapShopifyOrder(o));
+        const formattedManualOrders: OrderModel[] = (manualOrders || []).map(order => ({
           ...order,
           source: 'Manual' as const,
           currency: 'TRY',
           createdByAvatarUrl: order.createdByAvatarUrl ?? undefined
         }));
 
-        // Her iki siparişi birleştirip tarihe göre sıralıyoruz (yeniden eskiye)
         const combined: OrderModel[] = [...formattedManualOrders, ...shopifyOrders].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
@@ -64,36 +51,39 @@ export class OrderService {
   }
 
   /**
-   * Sipariş arama işlemi. Shopify ve manuel siparişlerde arama yapılır.
-   * @param query - Arama sorgusu
+   * (Opsiyonel) Front-end’de detay toplama: arama → ID listesi → tekil detail çağrıları.
+   * Büyük listelerde rate-limit ihtimali olduğundan max (default 50) ile sınırlar.
    */
-searchOrders(query: string): Observable<OrderModel[]> {
-  const manual$ = this.http
-    .get<any[]>(`${this.apiUrl}/manual-orders/search?query=${encodeURIComponent(query)}`)
-    .pipe(map(results => results.map(order => this.mapManualOrder(order))));
+  searchOrdersDetailedFrontOnly(query: string, max = 50): Observable<OrderModel[]> {
+    const url = `${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`;
 
-  const shopify$ = this.http
-    .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
-    .pipe(map(results => results.map(order => this.mapShopifyOrder(order))));
-
-  return forkJoin([manual$, shopify$]).pipe(
-    map(([manualOrders, shopifyOrders]) =>
-      [...manualOrders, ...shopifyOrders].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    return this.http.get<any[]>(url).pipe(
+      map(list => (list || []).map((o: any) => o.id)),                 // 1) id’leri al
+      map(ids => Array.from(new Set(ids)).slice(0, max)),              // 2) tekilleştir + sınırla
+      switchMap(ids => {
+        if (!ids.length) return of<OrderModel[]>([]);
+        const calls = ids.map((id: any) => this.getShopifyOrderById(String(id))); // 3) detail çağrıları
+        return forkJoin(calls);
+      }),
+      map(items =>
+        items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       )
-    )
-  );
-}
-
+    );
+  }
 
   /**
-   * Tüm manuel ve Shopify siparişlerini çeker (sayfalama yok)
+   * Manuel + Shopify araması (genel).
    */
-  getAllOrders(): Observable<OrderModel[]> {
-    return forkJoin([
-      this.getManualOrders(),
-      this.getShopifyOrders()
-    ]).pipe(
+  searchOrders(query: string): Observable<OrderModel[]> {
+    const manual$ = this.http
+      .get<any[]>(`${this.apiUrl}/manual-orders/search?query=${encodeURIComponent(query)}`)
+      .pipe(map(results => (results || []).map(order => this.mapManualOrder(order))));
+
+    const shopify$ = this.http
+      .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
+      .pipe(map(results => (results || []).map(order => this.mapShopifyOrder(order))));
+
+    return forkJoin([manual$, shopify$]).pipe(
       map(([manualOrders, shopifyOrders]) =>
         [...manualOrders, ...shopifyOrders].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -103,27 +93,43 @@ searchOrders(query: string): Observable<OrderModel[]> {
   }
 
   /**
-   * Tüm manuel siparişleri getirir
+   * (Kısayol) Sadece Shopify araması — Excel/export senaryoları için idealdir.
    */
-  getManualOrders(): Observable<OrderModel[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/manual-orders`).pipe(
-      map(response => response.map(order => this.mapManualOrder(order)))
-    );
+  searchOrdersShopifyOnly(query: string): Observable<OrderModel[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
+      .pipe(
+        map(results => (results || []).map(order => this.mapShopifyOrder(order))),
+        map(list => list.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)))
+      );
   }
 
   /**
-   * Shopify üzerinden siparişleri getirir (limit 100, sayfalama yok)
+   * Tüm siparişleri al (sayfalama yok).
    */
+  getAllOrders(): Observable<OrderModel[]> {
+    return forkJoin([this.getManualOrders(), this.getShopifyOrders()]).pipe(
+      map(([manualOrders, shopifyOrders]) =>
+        [...manualOrders, ...shopifyOrders].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+      )
+    );
+  }
+
+  getManualOrders(): Observable<OrderModel[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/manual-orders`).pipe(
+      map(response => (response || []).map(order => this.mapManualOrder(order)))
+    );
+  }
+
   getShopifyOrders(): Observable<OrderModel[]> {
     const url = `${this.apiUrl}/Shopify/orders-paged?limit=100`;
     return this.http.get<{ items: any[] }>(url).pipe(
-      map(response => response.items.map(order => this.mapShopifyOrder(order)))
+      map(response => (response.items || []).map(order => this.mapShopifyOrder(order)))
     );
   }
 
-  /**
-   * Belirli bir manuel siparişi ID'ye göre getirir
-   */
   getManualOrderById(id: string): Observable<OrderModel> {
     return this.http.get<any>(`${this.apiUrl}/manual-orders/${id}`).pipe(
       map(data => this.mapManualOrder(data))
@@ -131,18 +137,14 @@ searchOrders(query: string): Observable<OrderModel[]> {
   }
 
   /**
-   * Belirli bir Shopify siparişi ID'ye göre getirir
+   * DÜZELTİLDİ: Tekil Shopify sipariş endpoint’i → /api/Shopify/orders/{id}
    */
   getShopifyOrderById(id: string): Observable<OrderModel> {
-    return this.http.get<any>(`${this.apiUrl}/shopify-orders/${id}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/Shopify/orders/${id}`).pipe(
       map(data => this.mapShopifyOrder(data))
     );
   }
 
-  /**
-   * Yeni bir manuel sipariş oluşturur
-   * @param order - Sipariş bilgileri ve ürün listesi
-   */
   createManualOrder(order: {
     customerName: string;
     customerSurname?: string;
@@ -170,12 +172,12 @@ searchOrders(query: string): Observable<OrderModel[]> {
   }
 
   /**
-   * API'den gelen manuel siparişi OrderModel formatına dönüştürür
+   * Manuel siparişi OrderModel’e mapler.
    */
   private mapManualOrder(order: any): OrderModel {
     return {
-      id: order.id.toString(),
-      orderNumber: order.orderNumber ?? order.id.toString(),
+      id: String(order.id),
+      orderNumber: order.orderNumber ?? String(order.id),
       source: 'Manual',
       createdAt: order.createdAt,
       status: order.status,
@@ -196,70 +198,142 @@ searchOrders(query: string): Observable<OrderModel[]> {
       bonusAmount: order.bonusAmount,
       currency: 'TRY',
       createdByAvatarUrl: order.createdByAvatarUrl ?? undefined,
-      items: order.items?.map((item: any) => ({
+      items: (order.items || []).map((item: any) => ({
         productId: item.productId,
         productName: item.productName,
         quantity: item.quantity,
         price: item.price,
         variantId: item.variantId,
         variantName: item.variantName
-      })) ?? []
+      }))
     };
   }
 
   /**
-   * Shopify API'den gelen sipariş verisini OrderModel formatına dönüştürür
+   * Shopify siparişini OrderModel’e mapler.
+   * - Adres/İl/İlçe için shipping yoksa billing ve note_attributes fallback’ları.
+   * - TR düzeni: province → İL, city → İLÇE (ama notlar öncelikli).
    */
 private mapShopifyOrder(order: any): OrderModel {
   const financial = (order.financial_status || '').toLowerCase();
   const fulfillment = (order.fulfillment_status || '').toLowerCase();
 
   let status: string;
+  if (financial === 'paid' && fulfillment === 'fulfilled') status = 'Tamamlandı';
+  else if (financial === 'paid' && fulfillment === 'unfulfilled') status = 'Hazırlanıyor';
+  else if (financial === 'refunded') status = 'İade Edildi';
+  else if (financial === 'partially_refunded') status = 'Kısmi İade';
+  else if (financial === 'pending') status = 'Beklemede';
+  else if (financial === 'authorized') status = 'Onaylandı';
+  else if (financial === 'voided') status = 'İptal';
+  else status = 'Bilinmiyor';
 
-  if (financial === 'paid' && fulfillment === 'fulfilled') {
-    status = 'Tamamlandı';
-  } else if (financial === 'paid' && fulfillment === 'unfulfilled') {
-    status = 'Hazırlanıyor';
-  } else if (financial === 'refunded') {
-    status = 'İade Edildi';
-  } else if (financial === 'partially_refunded') {
-    status = 'Kısmi İade';
-  } else if (financial === 'pending') {
-    status = 'Beklemede';
-  } else if (financial === 'authorized') {
-    status = 'Onaylandı';
-  } else if (financial === 'voided') {
-    status = 'İptal';
-  } else {
-    status = 'Bilinmiyor';
-  }
+  // Adres: shipping varsa onu, yoksa billing
+  const addr = order.shipping_address ?? order.billing_address ?? {};
+  const address = [addr.address1, addr.address2].filter(Boolean).join(' ').trim();
+
+  // Notlardan Şehir/İlçe okunabiliyorsa onları tercih et
+  const noteIl   = this.getNoteAttr(order, ['şehir', 'sehir', 'il']);
+  const noteIlce = this.getNoteAttr(order, ['ilçe', 'ilce']);
+
+  // Shopify alanları: TR için çoğu mağazada city=İL, province=İLÇE kullanılıyor
+  // Elindeki örnekte de (Ankara / Polatlı) bu şekilde.
+  const city    = (noteIl   ?? addr.city     ?? '').toString().trim();     // İL
+  const district= (noteIlce ?? addr.province ?? '').toString().trim();     // İLÇE
+
+  // Telefonu en iyi kaynaktan çek ve normalize et (10 hane, 0'sız)
+  const phone = this.pickBestPhone(order);
+
+  const email = order.email || order.contact_email || order.customer?.email || '';
 
   return {
-    id: order.id.toString(),
-    orderNumber: order.order_number,
+    id: order.id?.toString() ?? '',
+    orderNumber: order.order_number ?? order.name ?? order.id?.toString(),
     source: 'Shopify',
     createdAt: order.created_at,
-    status: status,
-    customerName: `${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim() || 'Shopify Müşterisi',
-    phone: order.customer?.phone,
-    email: order.customer?.email,
-    address: order.shipping_address?.address1,
-    city: order.shipping_address?.city,
-    district: order.shipping_address?.province,
+    status,
+
+    customerName: `${order.customer?.first_name ?? addr.first_name ?? ''} ${order.customer?.last_name ?? addr.last_name ?? ''}`
+      .trim() || 'Shopify Müşterisi',
+    phone,
+    email,
+
+    address,
+    city,       // İL
+    district,   // İLÇE
+
     paymentType: 'Kredi Kartı',
     orderNote: order.note,
-    totalAmount: parseFloat(order.total_price),
+    totalAmount: parseFloat(order.total_price ?? '0') || 0,
     currency: order.currency ?? 'TRY',
     createdByAvatarUrl: undefined,
-    items: order.line_items?.map((item: any) => ({
-      productId: item.product_id,
-      productName: item.name,
+
+    items: (order.line_items ?? []).map((item: any) => ({
+      productId: String(item.product_id ?? ''),
+      productName: item.title ?? item.name,
       quantity: item.quantity,
-      price: parseFloat(item.price),
-      variantId: item.variant_id,
+      price: parseFloat(item.price ?? '0') || 0,
+      variantId: String(item.variant_id ?? ''),
       variantName: item.variant_title
-    })) ?? []
+    }))
   };
 }
+/** note_attributes içinden anahtar adına göre değer çek */
+private getNoteAttr(order: any, keys: string[]): string | undefined {
+  const list: any[] = order?.note_attributes ?? [];
+  const hit = list.find(x => {
+    const n = String(x?.name ?? '').toLowerCase();
+    return keys.some(k => n.includes(k.toLowerCase()));
+  });
+  const val = hit?.value;
+  return (val === undefined || val === null) ? undefined : String(val);
+}
 
+/** TR telefon: 10 hane, başında 0 yok (örn: 5364621515) */
+private normalizePhone10TR(raw: any): string {
+  let s = String(raw ?? '').replace(/\D/g, '');
+  if (!s) return '';
+  // +90 / 90 öneklerini kırp
+  if (s.startsWith('90') && s.length >= 12) s = s.slice(2);
+  // 0 ile başlıyorsa ve 11+ hane ise ilk 0'ı kırp (0536... -> 536...)
+  if (s.startsWith('0') && s.length >= 11) s = s.slice(1);
+  // son 10 haneyi al
+  return s.length >= 10 ? s.slice(-10) : s;
+}
+
+/** Adaylar içinden en iyi telefonu seç (öncelik: 10 hane ve 5 ile başlayan GSM) */
+private pickBestPhone(order: any): string {
+  const fromNotes = this.getNoteAttr(order, ['telefon', 'telefon numarası', 'phone']);
+
+  const candidates = [
+    order?.shipping_address?.phone,
+    order?.billing_address?.phone,
+    order?.customer?.phone,
+    fromNotes
+  ].filter(Boolean) as string[];
+
+  const norm = candidates
+    .map(c => this.normalizePhone10TR(c))
+    .filter(x => !!x);
+
+  // 10 haneli ve 5 ile başlayan varsa onu al
+  const gsm = norm.find(x => x.length === 10 && x.startsWith('5'));
+  if (gsm) return gsm;
+
+  // 10 haneli ilkini al
+  const ten = norm.find(x => x.length === 10);
+  if (ten) return ten;
+
+  // elde ne varsa en uzunu al (fallback)
+  return norm.sort((a, b) => b.length - a.length)[0] ?? '';
+}
+
+
+  /**
+   * DHL etiketli açık & unfulfilled siparişler (Shopify-only arama kısayolu ile).
+   */
+  getDhlOpenUnshipped(): Observable<OrderModel[]> {
+    const q = 'tag:DHL AND status:open AND fulfillment_status:unfulfilled';
+    return this.searchOrdersShopifyOnly(q);
+  }
 }

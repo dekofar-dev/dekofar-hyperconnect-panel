@@ -38,6 +38,12 @@ export const routes: Routes = [
         (m) => m.NotificationsModule
       ),
   },
+  {
+  path: 'excel-tools',
+  loadChildren: () =>
+    import('./modules/excel-tools/excel-tools.module').then(m => m.ExcelToolsModule),
+},
+
 ];
 
 @NgModule({

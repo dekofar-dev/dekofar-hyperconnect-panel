@@ -1,0 +1,105 @@
+<div class="card">
+  <!-- Header -->
+  <div class="card-header align-items-center">
+    <div class="card-title">
+      <h3 class="fw-bold mb-0">Excel Aktarımları → {{ filter() }} (Gönderilmemiş)</h3>
+      <span class="text-muted fs-7 ms-3">
+        Toplam: <strong>{{ orders().length }}</strong> kayıt
+      </span>
+    </div>
+
+    <div class="card-toolbar d-flex gap-3">
+      <select
+        class="form-select"
+        [ngModel]="filter()"
+        (ngModelChange)="onFilterChange($event)"
+        title="Kargo etiketi"
+        style="min-width: 160px"
+      >
+        <option value="DHL">DHL</option>
+        <option value="PTT">PTT</option>
+        <option value="ARAS">Aras</option>
+        <option value="ONAY">Onay</option>
+      </select>
+
+      <button
+        class="btn btn-primary"
+        (click)="exportExcel()"
+        [disabled]="orders().length === 0 || loading()"
+        title="Listeyi Excel olarak indir"
+      >
+        <i class="bi bi-file-earmark-excel me-2"></i>
+        Excel’e Aktar
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+    <!-- Hata Mesajı -->
+    <div *ngIf="error()" class="alert alert-danger d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <div>{{ error() }}</div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-responsive position-relative">
+      <!-- Loading overlay -->
+      <div
+        *ngIf="loading()"
+        class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-75"
+        style="z-index: 2"
+      >
+        <div class="spinner-border" role="status"></div>
+      </div>
+
+      <table class="table align-middle table-row-dashed gy-3">
+        <thead class="text-muted">
+          <tr class="fw-semibold">
+            <th style="min-width: 120px;">Sipariş #</th>
+            <th style="min-width: 140px;">Tarih</th>
+            <th style="min-width: 220px;">Müşteri</th>
+            <th style="min-width: 220px;">Adres</th>
+            <th style="min-width: 180px;">İl / İlçe</th>
+            <th style="min-width: 140px;">Tutar</th>
+            <th style="min-width: 140px;">Durum</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let o of orders(); trackBy: trackById">
+            <td class="fw-bold">{{ o.orderNumber || o.id }}</td>
+            <td>{{ o.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+            <td>
+              <div class="fw-semibold">{{ o.customerName || '-' }}</div>
+              <div class="text-muted fs-8">
+                {{ o.phone || '' }} <span *ngIf="o.phone && o.email">•</span> {{ o.email || '' }}
+              </div>
+            </td>
+            <td>{{ o.address || '-' }}</td>
+            <td>{{ o.city || '-' }} / {{ o.district || '-' }}</td>
+            <td>{{ o.totalAmount | number: '1.0-2' }} {{ o.currency || 'TRY' }}</td>
+            <td>
+              <span class="badge badge-light-warning">Gönderilmemiş</span>
+            </td>
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="!loading() && orders().length === 0">
+            <td colspan="7" class="text-center text-muted py-10">
+              Kayıt bulunamadı.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Alt bilgi -->
+    <div class="d-flex justify-content-between mt-4">
+      <div class="text-muted fs-8">
+        <b>{{ filter() }}</b> etiketi olan ve <b>gönderilmemiş</b> siparişler listelenir.
+      </div>
+      <div class="text-muted fs-8">{{ orders().length }} kayıt</div>
+    </div>
+  </div>
+</div>

@@ -10,7 +10,8 @@ export const environment = {
 
   // Canlı API adresi
   // apiUrl: 'https://api.dekofar.com/api',
-    apiUrl: 'http://localhost:5036/api',
+    apiUrl: 'https://dekofar-hyperconnect-api-production.up.railway.app/api',
+
   // Siteye özgü bilgiler
   siteName: 'Herdemtaze',
   siteDomain: 'herdemtaze.com.tr',
