@@ -46,8 +46,8 @@ private normalizePhone(input?: string | number | null): string {
    */
   exportDhlBatch(orders: OrderModel[], fileName: string, opt: DhlExportOptions = {}) {
     const {
-      kilo = 2,
-      desi = 2,
+      kilo = 3,
+      desi = 5,
       odemeTipi = 'G',
       teslimSekli = 'AT',
       kapidaTahsilat = 'E',
@@ -66,8 +66,10 @@ private normalizePhone(input?: string | number | null): string {
       const ref = o.orderNumber ?? (o as any).order_number ?? o.id ?? '';
       const name = (o.customerName ?? '').trim() || 'Müşteri';
       const addr = (o.address ?? '').trim();
-      const il   = (o.city ?? '').trim();
-      const ilce = (o.district ?? '').trim();
+// Excel'de IL ve ILCE tersine yazılsın:
+const il   = (o.district ?? '').trim(); // IL kolonuna district
+const ilce = (o.city ?? '').trim();     // ILCE kolonuna city
+
 
       const phone = this.normalizePhone(o.phone);
       const email = (o.email ?? '').trim();
@@ -75,7 +77,8 @@ private normalizePhone(input?: string | number | null): string {
       const firstItemName =
         (o.items?.[0]?.productName ?? o.items?.[0]?.variantName ?? '').trim() || 'Ürün';
 
-      const aciklama = (o.orderNote ?? '').trim();
+const aciklama =
+  (o.items?.[0]?.productName ?? o.items?.[0]?.variantName ?? '').trim() || 'Ürün';
       const irsaliye = ref; // sipariş no
       const kiymet = Number(o.totalAmount ?? 0);
 

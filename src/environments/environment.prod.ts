@@ -9,7 +9,6 @@ export const environment = {
   isMockEnabled: false,
 
   // Canlı API adresi
-  // apiUrl: 'https://api.dekofar.com/api',
     apiUrl: 'https://dekofar-hyperconnect-api-production.up.railway.app/api',
 
   // Siteye özgü bilgiler
