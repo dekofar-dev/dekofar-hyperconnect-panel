@@ -1,14 +1,17 @@
 <div class="card">
   <!-- Header -->
   <div class="card-header align-items-center">
-    <div class="card-title">
-      <h3 class="fw-bold mb-0">Excel Aktarımları → {{ filter() }} (Gönderilmemiş)</h3>
-      <span class="text-muted fs-7 ms-3">
+    <div class="card-title d-flex align-items-center gap-3">
+      <h3 class="fw-bold mb-0">
+        Excel Aktarımları → {{ filter() }} (Gönderilmemiş)
+      </h3>
+      <span class="text-muted fs-7">
         Toplam: <strong>{{ orders().length }}</strong> kayıt
       </span>
     </div>
 
     <div class="card-toolbar d-flex gap-3">
+      <!-- Filtre Dropdown -->
       <select
         class="form-select"
         [ngModel]="filter()"
@@ -22,6 +25,7 @@
         <option value="ONAY">Onay</option>
       </select>
 
+      <!-- Excel Export Butonu -->
       <button
         class="btn btn-primary"
         (click)="exportExcel()"
@@ -67,13 +71,16 @@
         </thead>
 
         <tbody>
+          <!-- Sipariş Listesi -->
           <tr *ngFor="let o of orders(); trackBy: trackById">
             <td class="fw-bold">{{ o.orderNumber || o.id }}</td>
             <td>{{ o.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
             <td>
               <div class="fw-semibold">{{ o.customerName || '-' }}</div>
               <div class="text-muted fs-8">
-                {{ o.phone || '' }} <span *ngIf="o.phone && o.email">•</span> {{ o.email || '' }}
+                {{ o.phone || '' }}
+                <span *ngIf="o.phone && o.email">•</span>
+                {{ o.email || '' }}
               </div>
             </td>
             <td>{{ o.address || '-' }}</td>

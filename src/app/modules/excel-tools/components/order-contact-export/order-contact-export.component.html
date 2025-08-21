@@ -1,0 +1,29 @@
+<div class="container py-10">
+  <div class="row align-items-center">
+    <!-- Sol kolon: Son 24 Saat -->
+    <div class="col-6 text-center border-end">
+      <button
+        class="btn btn-success btn-lg"
+        style="min-width: 250px;"
+        [disabled]="loading24()"
+        (click)="exportExcel(1)"
+      >
+        <i class="bi bi-download me-2"></i>
+        {{ loading24() ? 'Yükleniyor...' : (contacts24().length + ' Kişi (Son 24 Saat)') }}
+      </button>
+    </div>
+
+    <!-- Sağ kolon: Son 7 Gün -->
+    <div class="col-6 text-center">
+      <button
+        class="btn btn-purple btn-lg"
+        style="min-width: 250px;"
+        [disabled]="loading7()"
+        (click)="exportExcel(7)"
+      >
+        <i class="bi bi-download me-2"></i>
+        {{ loading7() ? 'Yükleniyor...' : (contacts7().length + ' Kişi (Son 7 Gün)') }}
+      </button>
+    </div>
+  </div>
+</div>

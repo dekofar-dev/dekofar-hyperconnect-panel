@@ -336,4 +336,27 @@ private pickBestPhone(order: any): string {
     const q = 'tag:DHL AND status:open AND fulfillment_status:unfulfilled';
     return this.searchOrdersShopifyOnly(q);
   }
+
+
+  /** Sadece isim + telefon için hafif sorgu (Shopify-only) */
+searchOrderContactsShopifyOnly(query: string): Observable<{ name: string; phone: string }[]> {
+  return this.http
+    .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
+    .pipe(
+      map(results => (results || []).map(order => {
+        const name = `${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim();
+        const phone = order.phone || order.customer?.phone || order.shipping_address?.phone || '';
+        return { name, phone };
+      })),
+      map(list =>
+        list
+          .map(x => ({
+            name: (x.name ?? '').trim(),
+            phone: (x.phone ?? '').toString().trim()
+          }))
+          .filter(x => x.name && x.phone) // boş olanları at
+      )
+    );
+}
+
 }

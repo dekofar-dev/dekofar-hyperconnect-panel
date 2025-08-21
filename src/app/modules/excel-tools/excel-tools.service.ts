@@ -21,28 +21,50 @@ export interface DhlExportOptions {
 export class ExcelToolsService {
   private static readonly VERGI_TC_NO = '29440840854';
 
-  /** Telefonu 10 hane ve başında 0 olacak şekilde normalize eder -> 0XXXXXXXXX */
-/** TR telefon: 10 hane, başında 0 yok (örn: 5364621515) */
-private normalizePhone(input?: string | number | null): string {
-  let s = String(input ?? '').replace(/\D/g, '');
-  if (!s) return '';
+/** Ürün kısa adları */
+private static readonly PRODUCT_SHORT_NAMES: Record<string, string> = {
+  "7908059578422": "Çaydanlık 2L Sarı",
+  "7908952703030": "Hofm",
+  "7907399827510": "Uyku Tulumu 200x70",
+  "7905164492854": "Gint",
+  "7907989618742": "Çaydanlık 3+1.5L",
+  "7908058824758": "Çaydanlık 3+2L",
+  "7908023697462": "Çaydanlık 3+2L Şık",
+  "7907974774838": "Çaydanlık 3+2L Sarı",
+  "7907402285110": "Termos 4L Premium",
+  "7908060397622": "safe",
+  "7907396550710": "Kettle Cam 2L+0.8L",
+  "7907398221878": "Sandalet Deri",
+  "7907942072374": "Çaydanlık 2.5+1L",
+  "7907395436598": "Çay Makinesi 2.3+1L",
+  "7907575005238": "Taktik Çanta",
+};
 
-  // +90 / 90 kırp
-  if (s.startsWith('90') && s.length >= 12) s = s.slice(2);
 
-  // 0 ile başlıyorsa ve 11+ hane ise 0'ı kırp (0536... -> 536...)
-  if (s.startsWith('0') && s.length >= 11) s = s.slice(1);
+  /** Telefonu normalize eder -> 10 hane, başında 0 olacak şekilde */
+  private normalizePhone(input?: string | number | null): string {
+    let s = String(input ?? '').replace(/\D/g, '');
+    if (!s) return '';
 
-  // Son 10 haneyi al
-  if (s.length >= 10) return s.slice(-10);
+    if (s.startsWith('90') && s.length >= 12) s = s.slice(2);
+    if (s.startsWith('0') && s.length >= 11) s = s.slice(1);
+    if (s.length >= 10) return s.slice(-10);
 
-  // 10 haneden kısa ise olduğu gibi dön (çok nadir durum)
-  return s;
-}
+    return s;
+  }
+
+  /** Ürün adı kısaltma + varyant + adet */
+  private getShortName(productId?: string, variantName?: string, qty?: number): string {
+    const base = productId
+      ? ExcelToolsService.PRODUCT_SHORT_NAMES[productId] || 'Ürün'
+      : 'Ürün';
+    const variant = variantName ? ` ${variantName}` : '';
+    const count = qty && qty > 1 ? ` x${qty}` : '';
+    return base + variant + count;
+  }
 
   /**
    * Siparişleri DHL toplu yükleme şablonuna dönüştürür.
-   * Zorunlu: REFERANS_ID, ALICI_ADI, ADRES, IL, ILCE, TELEFON, KARGO_ICERIK, ADET, KIYMET
    */
   exportDhlBatch(orders: OrderModel[], fileName: string, opt: DhlExportOptions = {}) {
     const {
@@ -66,20 +88,18 @@ private normalizePhone(input?: string | number | null): string {
       const ref = o.orderNumber ?? (o as any).order_number ?? o.id ?? '';
       const name = (o.customerName ?? '').trim() || 'Müşteri';
       const addr = (o.address ?? '').trim();
-// Excel'de IL ve ILCE tersine yazılsın:
-const il   = (o.district ?? '').trim(); // IL kolonuna district
-const ilce = (o.city ?? '').trim();     // ILCE kolonuna city
 
+      // Excel’de IL ve ILCE ters yazılacak
+      const il   = (o.district ?? '').trim(); // IL kolonuna district
+      const ilce = (o.city ?? '').trim();     // ILCE kolonuna city
 
       const phone = this.normalizePhone(o.phone);
       const email = (o.email ?? '').trim();
 
-      const firstItemName =
-        (o.items?.[0]?.productName ?? o.items?.[0]?.variantName ?? '').trim() || 'Ürün';
-
-const aciklama =
-  (o.items?.[0]?.productName ?? o.items?.[0]?.variantName ?? '').trim() || 'Ürün';
-      const irsaliye = ref; // sipariş no
+      const firstItem = o.items?.[0];
+      const kargoIcerik = this.getShortName(firstItem?.productId, firstItem?.variantName, firstItem?.quantity);
+      const aciklama = kargoIcerik;
+      const irsaliye = ref;
       const kiymet = Number(o.totalAmount ?? 0);
 
       return [
@@ -89,27 +109,24 @@ const aciklama =
         addr,                         // ADRES
         il,                           // IL
         ilce,                         // ILCE
-        phone,                        // TELEFON (10 hane, başında 0)
+        phone,                        // TELEFON
         phone,                        // TELEFON_CEP
         email,                        // EMAIL
-        ExcelToolsService.VERGI_TC_NO,// KIMLIK_VERGI_NO (sabit)
+        ExcelToolsService.VERGI_TC_NO,// KIMLIK_VERGI_NO
         '',                           // VERGI_DAIRESI
-        firstItemName,                // KARGO_ICERIK (ürün adı)
-        1,                            // ADET (sabit 1)
-        kilo,                         // KILO (sabit 3)
-        desi,                         // DESI (sabit 5)
-        odemeTipi,                    // ODEME_TIPI_A_G ('G')
-        teslimSekli,                  // TESLIM_SEKLI_AH_AT_TI ('AT')
+        kargoIcerik,                  // KARGO_ICERIK
+        firstItem?.quantity ?? 1,     // ADET
+        kilo,                         // KILO
+        desi,                         // DESI
+        odemeTipi,                    // ODEME_TIPI_A_G
+        teslimSekli,                  // TESLIM_SEKLI_AH_AT_TI
         aciklama,                     // ACIKLAMA
-        irsaliye,                     // IRSALIYE_NO (sipariş no)
-        kiymet,                       // KIYMET (totalAmount)
-        kapidaTahsilat,               // KAPIDA_TAHSILAT ('E')
+        irsaliye,                     // IRSALIYE_NO
+        kiymet,                       // KIYMET
+        kapidaTahsilat,               // KAPIDA_TAHSILAT
         aliciSms,                     // ALICI_SMS_E_H
         gondericiSms,                 // GONDERICI_SMS_E_H
-        '',                           // PARCA_DAGILIMI
-        '',                           // PLATFORM_KISA_KODU
-        '',                           // PLATFORM_SATIS_KODU
-        ''                            // SIPARIS_BARKOD
+        '', '', '', ''                // diğer kolonlar boş
       ];
     });
 
@@ -125,4 +142,18 @@ const aciklama =
   exportShopifyToTemplate(orders: OrderModel[], fileName: string) {
     this.exportDhlBatch(orders, fileName);
   }
+
+
+
+exportSimple(rows: any[], fileName: string): void {
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(rows);
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Rehber');
+  const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([buf], { type: 'application/octet-stream' });
+  saveAs(blob, fileName);
+}
+
+
+
 }

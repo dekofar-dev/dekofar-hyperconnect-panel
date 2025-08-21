@@ -18,12 +18,13 @@ export class ShopifyExportComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   orders = signal<OrderModel[]>([]);
-  filter = signal<CarrierFilter>('DHL'); // varsayılan
+  filter = signal<CarrierFilter>('DHL'); // varsayılan DHL
 
   ngOnInit(): void {
     this.load();
   }
 
+  /** Shopify arama query’si oluşturur */
   private buildQuery(): string {
     const parts = ['status:open', 'fulfillment_status:unfulfilled'];
     const f = this.filter();
@@ -34,14 +35,15 @@ export class ShopifyExportComponent implements OnInit {
     return parts.join(' AND ');
   }
 
+  /** Siparişleri API’den yükler */
   load(): void {
     this.loading.set(true);
     this.error.set(null);
 
     const q = this.buildQuery();
 
-    // Gelişmiş: önce arama ile ID’ler, sonra detay endpoint’leri (backend: /api/Shopify/orders/{id})
-    this.orderService.searchOrdersDetailedFrontOnly(q, 50).subscribe({
+    // 🔹 Daha hızlı versiyon → tek request
+    this.orderService.searchOrdersShopifyOnly(q).subscribe({
       next: (items) => {
         this.orders.set(items.filter((x) => x.source === 'Shopify'));
         this.loading.set(false);
@@ -54,6 +56,7 @@ export class ShopifyExportComponent implements OnInit {
     });
   }
 
+  /** Excel’e export */
   exportExcel(): void {
     const suffix = this.filter().toLowerCase();
     this.excel.exportDhlBatch(
@@ -62,13 +65,14 @@ export class ShopifyExportComponent implements OnInit {
       {
         kilo: 3,
         desi: 5,
-        kapidaTahsilat: 'E', // kapıda tahsilat var
+        kapidaTahsilat: 'E', // kapıda tahsilat
         odemeTipi: 'G',      // gönderici öder
-        teslimSekli: 'AT',   // teslim şekli AT
+        teslimSekli: 'AT',   // teslim şekli
       }
     );
   }
 
+  /** Filtre değiştirildiğinde tekrar yükler */
   onFilterChange(value: CarrierFilter): void {
     this.filter.set(value);
     this.load();
