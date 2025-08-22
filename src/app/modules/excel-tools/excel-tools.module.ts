@@ -5,16 +5,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExcelToolsRoutingModule } from './excel-tools-routing.module';
 import { ShopifyExportComponent } from './components/shopify-export/shopify-export.component';
 import { OrderContactExportComponent } from './components/order-contact-export/order-contact-export.component';
+import { ExistingCustomerOrdersComponent } from './existing-customer-orders/existing-customer-orders.component';
 
 @NgModule({
   declarations: [
-    ShopifyExportComponent,   
-    OrderContactExportComponent
+    ShopifyExportComponent,
+    OrderContactExportComponent,
+    ExistingCustomerOrdersComponent
   ],
   imports: [
     CommonModule,
-    FormsModule,              
-    ReactiveFormsModule,  
+    FormsModule,
+    ReactiveFormsModule,
     ExcelToolsRoutingModule,
   ],
 })

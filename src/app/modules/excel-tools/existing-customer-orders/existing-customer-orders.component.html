@@ -1,0 +1,27 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="fw-bold">Eski Müşteri Dedektörü</h3>
+  </div>
+  <div class="card-body">
+    <p>Son 7 günde <strong>{{ totalMatches }}</strong> eski müşteri bulundu.</p>
+
+    <table class="table table-striped" *ngIf="matchedOrders.length > 0">
+      <thead>
+        <tr>
+          <th>Sipariş No</th>
+          <th>Müşteri</th>
+          <th>Telefon</th>
+          <th>Tarih</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of matchedOrders">
+          <td>{{ order.orderNumber }}</td>
+          <td>{{ order.customerName }}</td>
+          <td>{{ order.phone }}</td>
+          <td>{{ order.createdAt | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
