@@ -23,20 +23,20 @@ export class ExcelToolsService {
 
 /** Ürün kısa adları */
 private static readonly PRODUCT_SHORT_NAMES: Record<string, string> = {
-  "7908059578422": "Çaydanlık 2L Sarı",
-  "7908952703030": "Hofm",
+  "7908059578422": "Sarı Siyah tekli",
+  "7908952703030": "Rose Cam",
   "7907399827510": "Uyku Tulumu 200x70",
   "7905164492854": "Gint",
   "7907989618742": "Çaydanlık 3+1.5L",
   "7908058824758": "Çaydanlık 3+2L",
   "7908023697462": "Çaydanlık 3+2L Şık",
   "7907974774838": "Çaydanlık 3+2L Sarı",
-  "7907402285110": "Termos 4L Premium",
+  "7907402285110": "4L Termos",
   "7908060397622": "safe",
-  "7907396550710": "Kettle Cam 2L+0.8L",
+  "7907396550710": "Gri Cam",
   "7907398221878": "Sandalet Deri",
   "7907942072374": "Çaydanlık 2.5+1L",
-  "7907395436598": "Çay Makinesi 2.3+1L",
+  "7907395436598": "Çelik Çaycı",
   "7907575005238": "Taktik Çanta",
 };
 
