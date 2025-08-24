@@ -1,162 +1,168 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <!--begin::Card-->
-      <div class="card shadow-lg border-0">
-        <!--begin::Header-->
-        <div class="card-header align-items-center">
-          <div class="card-title d-flex align-items-center gap-3">
-            <h3 class="fw-bold mb-0">📦 Takip Kodu ile Kargo Sorgulama</h3>
-          </div>
-        </div>
-        <!--end::Header-->
-
-        <!--begin::Body-->
-        <div class="card-body p-lg-6">
-          <!-- Input -->
-          <div class="mb-3">
-            <label class="form-label fw-bold">Gönderi Takip Numarası</label>
-            <input
-              type="text"
-              [(ngModel)]="shipmentId"
-              class="form-control form-control-lg"
-              placeholder="Takip numarası giriniz"
-            />
-          </div>
-
-          <button
-            class="btn btn-success btn-lg w-100"
-            (click)="search()"
-            [disabled]="loading"
-          >
-            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-            🚀 Sorgula
-          </button>
-
-          <!-- Hata Mesajı -->
-          <div *ngIf="error" class="alert alert-danger mt-3 d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <div>{{ error }}</div>
-          </div>
-
-          <!-- Son Durum -->
-          <div *ngIf="status" class="mt-4">
-            <h4 class="fw-bold text-primary">📦 Son Durum</h4>
-            <div class="p-3 border rounded bg-light">
-              <p>
-                <strong>Durum:</strong>
-                <span class="badge bg-info text-dark">{{
-                  status?.shipmentStatusExplanation
-                }}</span>
-              </p>
-              <p><strong>Takip No:</strong> {{ status?.shipmentId }}</p>
-              <p><strong>Sipariş No:</strong> {{ status?.referenceId }}</p>
-              <p><strong>Tarih:</strong> {{ status?.statusDateTime }}</p>
-            </div>
-          </div>
-
-          <!-- Hareket Geçmişi -->
-          <div *ngIf="tracks && tracks.length > 0" class="mt-4">
-            <h4 class="fw-bold text-success">🚚 Hareket Geçmişi</h4>
-            <div class="table-responsive position-relative">
-              <table class="table table-hover align-middle">
-                <thead class="table-dark">
-                  <tr>
-                    <th>Tarih</th>
-                    <th>Durum</th>
-                    <th>Lokasyon</th>
-                    <th>Alıcı</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let t of tracks">
-                    <td>{{ t.eventDateTime }}</td>
-                    <td>
-                      <span class="badge bg-primary">{{ t.eventStatus }}</span>
-                    </td>
-                    <td>
-                      {{ t.location }} <br />
-                      <small class="text-muted">{{ t.locationAddress }}</small>
-                    </td>
-                    <td>{{ t.deliveryTo }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Gönderi Detayları -->
-          <div *ngIf="detail" class="mt-4">
-            <h4 class="fw-bold text-dark">📑 Gönderi Detayları</h4>
-            <table class="table table-bordered table-striped">
-              <tr>
-                <th>Servis Tipi</th>
-                <td>{{ detail.shipment?.shipmentServiceType }}</td>
-              </tr>
-              <tr>
-                <th>Paket Tipi</th>
-                <td>{{ detail.shipment?.packagingType }}</td>
-              </tr>
-              <tr>
-                <th>Ödeme Tipi</th>
-                <td>{{ detail.shipment?.paymentType }}</td>
-              </tr>
-              <tr>
-                <th>Teslimat Tipi</th>
-                <td>{{ detail.shipment?.deliveryType }}</td>
-              </tr>
-              <tr>
-                <th>Sipariş No</th>
-                <td>{{ detail.shipment?.referenceId }}</td>
-              </tr>
-              <tr>
-                <th>Gönderi ID</th>
-                <td>{{ detail.shipment?.shipmentId }}</td>
-              </tr>
-              <tr>
-                <th>Kilo</th>
-                <td>{{ detail.shipment?.totalKg }}</td>
-              </tr>
-              <tr>
-                <th>Desi</th>
-                <td>{{ detail.shipment?.totalDesi }}</td>
-              </tr>
-              <tr>
-                <th>KDV</th>
-                <td>{{ detail.shipment?.kdv }} TL</td>
-              </tr>
-              <tr>
-                <th>Toplam</th>
-                <td>{{ detail.shipment?.total }} TL</td>
-              </tr>
-              <tr>
-                <th>Genel Toplam</th>
-                <td>
-                  <strong>{{ detail.shipment?.finalTotal }} TL</strong>
-                </td>
-              </tr>
-              <tr *ngIf="detail.shipment?.isCOD === 1" class="bg-warning">
-                <th>💰 Kapıda Ödeme Tutarı</th>
-                <td>
-                  <span class="fs-4 fw-bold text-danger">{{
-                    detail.shipment?.codAmount
-                  }} TL</span>
-                </td>
-              </tr>
-              <tr>
-                <th>İçerik</th>
-                <td>{{ detail.shipment?.content }}</td>
-              </tr>
-              <tr>
-                <th>Tahmini Teslim</th>
-                <td>{{ detail.shipment?.estimatedDeliveryDate }}</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-        <!--end::Body-->
+<div class="container-fluid mt-4">
+  <!-- Arama Kutusu -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="input-group input-group-lg shadow-sm">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Takip numarası giriniz"
+          [(ngModel)]="shipmentId"
+        />
+        <button
+          class="btn btn-success"
+          type="button"
+          (click)="search()"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          🚀 Sorgula
+        </button>
       </div>
-      <!--end::Card-->
     </div>
+  </div>
+
+  <!-- Eğer detay geldiyse -->
+  <div *ngIf="detail">
+    <div class="row">
+      <!-- Sol Özet Alan -->
+      <div class="col-lg-4 mb-4">
+        <div class="p-3 border rounded mb-3 bg-light shadow-sm">
+          <h6 class="fw-bold text-muted">Gönderi Numarası</h6>
+          <p class="fs-5 fw-bold text-dark">{{ detail.shipment?.shipmentId }}</p>
+        </div>
+
+        <div class="p-3 border rounded mb-3 bg-light shadow-sm">
+          <h6 class="fw-bold text-muted">Tahmini Teslimat</h6>
+          <p class="mb-0 text-dark">
+            {{ detail.shipment?.estimatedDeliveryDate }}<br />
+            <small class="text-muted">1-3 iş günüdür</small>
+          </p>
+        </div>
+
+        <div class="p-3 border rounded mb-3 bg-light shadow-sm">
+          <h6 class="fw-bold text-muted">Alıcı Adı</h6>
+          <p class="fs-5 fw-bold text-dark">{{ detail.recipient?.fullName }}</p>
+        </div>
+
+        <div class="p-3 border rounded bg-light shadow-sm">
+          <h6 class="fw-bold text-muted">Gönderi Çıkış Tarihi</h6>
+          <p class="fs-6 text-dark">{{ detail.shipment?.shipmentDateTime }}</p>
+        </div>
+      </div>
+
+      <!-- Sağ Detay Alan -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white">
+            <h5 class="fw-bold text-dark mb-0">📑 Gönderi Detayı</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Alıcı Adresi</strong>
+                <p>{{ detail.recipient?.address }}</p>
+              </div>
+
+              <div class="col-md-6">
+                <strong>Teslimat Birimi</strong>
+                <p>{{ detail.recipient?.city }} {{ detail.recipient?.district }}</p>
+              </div>
+
+              <div class="col-md-6">
+                <strong>Gönderi Türü</strong>
+                <p>
+                  {{ detail.shipment?.pieceCount }} Adet Paket •
+                  {{ detail.shipment?.totalDesi }} Desi
+                </p>
+              </div>
+
+              <div class="col-md-6">
+                <strong>Sipariş Numarası</strong>
+                <p>#{{ detail.shipment?.referenceId }}</p>
+              </div>
+
+              <div class="col-md-6">
+                <strong>Ödeme ve Teslim Tipi</strong>
+                <p>
+                  {{ detail.shipment?.paymentType }} •
+                  {{ detail.shipment?.deliveryType }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Kapıda Ödeme Tutarı -->
+            <div
+              *ngIf="detail.shipment?.isCOD === 1"
+              class="p-3 bg-light border rounded mt-3"
+            >
+              <h6 class="fw-bold text-dark mb-1">💰 Kapıda Ödeme Tutarı</h6>
+              <p class="text-danger fw-bold fs-4 mb-0">
+                {{ detail.shipment?.codAmount }} TL
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hareket Geçmişi Timeline -->
+<!-- Hareket Geçmişi Timeline -->
+<div class="row mt-4" *ngIf="tracks && tracks.length > 0">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-warning d-flex align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">🚚 Gönderi Hareketleri</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <strong>Gönderi Durumu :</strong>
+          <span class="text-danger fw-bold">{{ status?.shipmentStatusExplanation }}</span>
+        </div>
+
+        <ul class="timeline list-unstyled">
+          <li *ngFor="let t of tracks" class="timeline-item">
+            <!-- Sol ikon -->
+            <div class="timeline-icon"
+              [ngClass]="{
+                'bg-success': t.eventStatus?.includes('Teslim Edildi'),
+                'bg-purple': t.eventStatus?.includes('Yönlendirildi') || t.eventStatus?.includes('Yolda'),
+                'bg-warning': t.eventStatus?.includes('Transfer'),
+                'bg-danger': t.eventStatus?.includes('Edilemedi'),
+                'bg-info': t.eventStatus?.includes('Hazırlandı')
+              }"
+            >
+              <i class="bi"
+                [ngClass]="{
+                  'bi-check-circle': t.eventStatus?.includes('Teslim Edildi'),
+                  'bi-truck': t.eventStatus?.includes('Yönlendirildi') || t.eventStatus?.includes('Yolda'),
+                  'bi-arrow-left-right': t.eventStatus?.includes('Transfer'),
+                  'bi-x-circle': t.eventStatus?.includes('Edilemedi'),
+                  'bi-box-seam': t.eventStatus?.includes('Hazırlandı')
+                }">
+              </i>
+            </div>
+
+            <!-- İçerik -->
+            <div class="timeline-content">
+              <span class="timeline-date">
+                {{ t.eventDateTime2 | date:'dd.MM.yyyy HH:mm' }}
+              </span>
+              <h6 class="fw-bold mb-1">{{ t.eventStatus }}</h6>
+              <p class="mb-1">
+                {{ t.description || ('Gönderiniz ' + (t.location || '') + ' biriminde işlem görmüştür.') }}
+              </p>
+              <small class="text-muted">{{ t.location }} {{ t.locationAddress }}</small>
+              <div *ngIf="t.deliveryTo" class="mt-1">
+                <small class="text-dark fw-bold">Teslim Alan: {{ t.deliveryTo }}</small>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
   </div>
 </div>

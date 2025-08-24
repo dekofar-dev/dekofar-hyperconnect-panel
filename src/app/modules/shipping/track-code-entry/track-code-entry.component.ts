@@ -1,21 +1,21 @@
 import { Component } from '@angular/core';
-import { 
-  ShippingService, 
-  ShipmentStatus, 
-  ShipmentTrack, 
-  ShipmentDetail 
+import {
+  ShippingService,
+  ShipmentStatus,
+  ShipmentTrack,
+  ShipmentDetail,
 } from '../shipping.service';
 
 @Component({
   selector: 'app-track-code-entry',
-  templateUrl: './track-code-entry.component.html'
+  templateUrl: './track-code-entry.component.html',
 })
 export class TrackCodeEntryComponent {
   shipmentId: string = '';
 
-  status?: ShipmentStatus;        // Son durum bilgisi
-  tracks: ShipmentTrack[] = [];   // Hareket geçmişi
-  detail?: ShipmentDetail;        // Detaylı gönderi bilgisi
+  status?: ShipmentStatus;
+  tracks: ShipmentTrack[] = [];
+  detail?: ShipmentDetail;
 
   loading = false;
   error?: string;
@@ -28,14 +28,14 @@ export class TrackCodeEntryComponent {
       return;
     }
 
-    // Reset state
+    // Reset
     this.loading = true;
     this.error = undefined;
     this.status = undefined;
     this.tracks = [];
     this.detail = undefined;
 
-    // 1) DHL/MNG son durumu getir
+    // 1) Son durum
     this.shippingService.getShipmentStatus(this.shipmentId).subscribe({
       next: (res) => {
         this.status = res;
@@ -44,23 +44,29 @@ export class TrackCodeEntryComponent {
       error: () => {
         this.loading = false;
         this.error = '⚠️ Gönderi bulunamadı veya hatalı takip kodu';
-      }
+      },
     });
 
-    // 2) Hareket geçmişi
+    // 2) Hareket geçmişi (son durum ilk)
     this.shippingService.trackShipment(this.shipmentId).subscribe({
       next: (res) => {
-        this.tracks = res;
+        this.tracks = res
+          .filter((t) => t.eventDateTime)
+          .sort(
+            (a, b) =>
+              new Date(b.eventDateTime!).getTime() -
+              new Date(a.eventDateTime!).getTime()
+          );
       },
-      error: () => {}
+      error: () => {},
     });
 
-    // 3) Gönderi detay bilgisi
+    // 3) Gönderi detay
     this.shippingService.getShipmentDetail(this.shipmentId).subscribe({
       next: (res) => {
         this.detail = res;
       },
-      error: () => {}
+      error: () => {},
     });
   }
 }
