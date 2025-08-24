@@ -125,6 +125,11 @@ const Routing: Routes = [
         (m) => m.PermissionsModule
       ),
   },
+    {
+  path: 'shipping',
+  loadChildren: () =>
+    import('../modules/shipping/shipping.module').then((m) => m.ShippingModule),
+},
   {
     path: 'settings/admin-ip',
     loadChildren: () =>
