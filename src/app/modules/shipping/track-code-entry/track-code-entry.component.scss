@@ -1,129 +1,38 @@
-.timeline {
-  position: relative;
-  margin: 0;
-  padding: 0;
+/* ---- Metronic dostu küçük dokunuşlar ---- */
+:root { --hc-accent: #dc3545; } /* Dilersen DHL kırmızısı */
+
+/* Arama: sade kenar, gölge var */
+.hc-search .form-control{ border:0; box-shadow:none!important; }
+.hc-search .form-control:focus{ box-shadow:none!important; }
+.hc-search .btn{ border:0; }
+
+/* Metin stilleri (Metronic tonları) */
+.label{ color:#7E8299; font-weight:600; font-size:.9rem; }
+.value{ color:#181C32; font-weight:700; }
+.value-lg{ font-size:1.15rem; font-weight:800; letter-spacing:.2px; }
+
+/* Sol özet kartı */
+.summary-tile{
+  background:#F5F8FA;             /* Metronic'in light grisi */
+  border:1px solid #EEF0F4;
+  border-radius:.9rem;
+  padding:1rem;
+  display:flex; gap:.9rem; align-items:flex-start;
+  box-shadow:0 1px 2px rgba(0,0,0,.03);
+}
+.summary-tile .symbol{
+  width:42px; height:42px; border-radius:.65rem;
+  display:grid; place-items:center;
+  background:#fff;
+  border:1px solid #F1D3D6;
+  color:var(--hc-accent);
+  font-size:1.15rem;
 }
 
-.timeline::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 20px;
-  width: 2px;
-  height: 100%;
-  background: #dee2e6;
-}
-
-.timeline-item {
-  position: relative;
-  margin-bottom: 2rem;
-  padding-left: 60px;
-}
-
-.timeline-item:last-child {
-  margin-bottom: 0;
-}
-
-.timeline-icon {
-  position: absolute;
-  top: 0;
-  left: 10px;
-  width: 24px;
-  height: 24px;
-  background: #f8f9fa;
-  border: 2px solid #6c757d;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6c757d;
-  font-size: 14px;
-  z-index: 1;
-}
-
-.timeline-content {
-  background: #fdfdfd;
-  border: 1px solid #e9ecef;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.timeline-date {
-  display: inline-block;
-  background: #6c757d;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding: 0.2rem 0.6rem;
-  border-radius: 0.25rem;
-  margin-bottom: 0.5rem;
-}
-.card {
-  border-radius: 0.75rem;
-}
-
-.bg-light {
-  background: #f8f9fa !important;
-}
-
-small.text-muted {
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-span.fw-bold {
-  font-size: 1rem;
-}
-.timeline {
-  position: relative;
-  margin: 0;
-  padding: 0;
-}
-.timeline::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 30px;
-  width: 2px;
-  height: 100%;
-  background: #dee2e6;
-}
-.timeline-item {
-  position: relative;
-  margin-bottom: 2rem;
-  padding-left: 80px;
-}
-.timeline-icon {
-  position: absolute;
-  top: 0;
-  left: 15px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: #fff;
-}
-.bg-purple {
-  background: #6f42c1 !important;
-}
-.timeline-content {
-  background: #fff;
-  border: 1px solid #e9ecef;
-  border-radius: 0.5rem;
-  padding: 1rem 1.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-.timeline-date {
-  display: inline-block;
-  background: #6c757d;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: bold;
-  padding: 0.3rem 0.75rem;
-  border-radius: 0.25rem;
-  margin-bottom: 0.5rem;
+/* Light danger alert tonu (Metronic ile uyumlu) */
+.alert-light-danger{
+  --bs-alert-bg:#FFF5F5;
+  --bs-alert-border-color:#FDE3E3;
+  --bs-alert-color:#C82132;
+  border:1px solid var(--bs-alert-border-color);
 }
