@@ -178,7 +178,7 @@
 </div>
 
 <!-- Siparişler -->
-<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion " data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/ecommerce/ecm001.svg'" class="svg-icon svg-icon-2"></span>
@@ -188,14 +188,14 @@
   </span>
   <div class="menu-sub menu-sub-accordion">
     <!-- Shopify Siparişleri -->
-    <div class="menu-item disabled">
+    <div class="menu-item ">
       <a
         class="menu-link"
         [routerLink]="['/orders']"
         [queryParams]="{ source: 'shopify' }"
         routerLinkActive="active"
       >
-        <span class="menu-title">Shopify Siparişleri</span>
+        <span class="menu-title">Tüm Siparişleri</span>
       </a>
     </div>
 

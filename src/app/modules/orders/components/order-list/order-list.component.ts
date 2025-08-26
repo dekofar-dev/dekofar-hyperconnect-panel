@@ -22,6 +22,12 @@ export class OrderListComponent implements OnInit {
 
   readonly pageSize: number = 20;
 
+  // 🔽 Modal için state
+  syncModalOpen = false;
+  syncResults: any[] = [];
+  syncSuccessCount = 0;
+  syncFailCount = 0;
+
   constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {
@@ -177,5 +183,32 @@ export class OrderListComponent implements OnInit {
       case 'iptal': return 'badge-light-danger';
       default: return 'badge-light';
     }
+  }
+
+  /** ✅ Yeni eklenen fonksiyon: Son 7 gün sync-now çağrısı */
+  onSyncLast7Days(): void {
+    this.isLoading = true;
+    this.orderService.syncNowDhlShopify().subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.syncSuccessCount = res.successCount ?? 0;
+        this.syncFailCount = res.failCount ?? 0;
+        this.syncResults = res.details ?? [];
+        this.syncModalOpen = true; // modal aç
+        this.loadOrders(this.currentPageInfo ?? undefined);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Sync hatası', err);
+        this.syncSuccessCount = 0;
+        this.syncFailCount = 0;
+        this.syncResults = [{ TrackingNo: '-', Error: 'Backend hatası: ' + err.message }];
+        this.syncModalOpen = true;
+      },
+    });
+  }
+
+  closeSyncModal(): void {
+    this.syncModalOpen = false;
   }
 }

@@ -358,5 +358,12 @@ searchOrderContactsShopifyOnly(query: string): Observable<{ name: string; phone:
       )
     );
 }
+/** DHL → Shopify senkron job’unu manuel tetikler */
+// syncNowDhlShopify(): Observable<{ message: string }> {
+//   return this.http.post<{ message: string }>(`${this.apiUrl}/DhlKargo/sync-now`, {});
+// }
+syncNowDhlShopify(): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/DhlKargo/sync-last7days`, {});
+}
 
 }

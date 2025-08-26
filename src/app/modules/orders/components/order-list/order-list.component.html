@@ -40,6 +40,10 @@
         </div>
       </div>
       <!--end::Card header-->
+  <!-- ✅ Yeni Buton -->
+<button class="btn btn-success me-3" (click)="onSyncLast7Days()">
+  📦 Son 7 Günü Senkronize Et
+</button>
 
       <!--begin::Card body-->
       <div class="card-body pt-0">
@@ -118,3 +122,39 @@
   <!--end::Container-->
 </div>
 <!--end::Content-->
+<div class="modal fade show" tabindex="-1" *ngIf="syncModalOpen" style="display: block; background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">DHL → Shopify Son 7 Gün Sonuç</h5>
+        <button type="button" class="btn-close" (click)="closeSyncModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p>✅ Başarılı: {{syncSuccessCount}} | ❌ Hatalı: {{syncFailCount}}</p>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>TrackingNo</th>
+              <th>OrderId</th>
+              <th>Durum</th>
+              <th>Hata</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of syncResults">
+              <td>{{r.Date}}</td>
+              <td>{{r.TrackingNo}}</td>
+              <td>{{r.ShopifyOrderId}}</td>
+              <td>{{r.Status}}</td>
+              <td>{{r.Error}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeSyncModal()">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
