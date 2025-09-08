@@ -151,6 +151,12 @@ const Routing: Routes = [
       ),
   },
   {
+  path: 'support',
+  loadChildren: () =>
+    import('../modules/support/support.module').then((m) => m.SupportModule),
+},
+
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',

@@ -1,0 +1,79 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">SMS Gelen Kutusu</div>
+    <div class="card-toolbar">
+      <button class="btn btn-light-primary" (click)="load()" [disabled]="loading">
+        <i class="ki-duotone ki-refresh"></i> Yenile
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Filtreler -->
+    <form class="row g-3 mb-5" [formGroup]="form" (ngSubmit)="load()">
+      <div class="col-md-3">
+        <label class="form-label">Başlangıç</label>
+        <input type="date" class="form-control" formControlName="from" />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Bitiş</label>
+        <input type="date" class="form-control" formControlName="to" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Ara</label>
+        <input class="form-control" placeholder="Numara veya içerik" formControlName="search" />
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100" type="submit" [disabled]="loading || form.invalid">
+          Getir
+        </button>
+      </div>
+    </form>
+
+    <!-- Tablo -->
+    <div class="table-responsive">
+      <table class="table align-middle table-row-dashed">
+        <thead>
+          <tr class="fw-bold">
+            <th style="width: 220px;">Gönderen</th>
+            <th>İçerik</th>
+            <th style="width: 200px;">Tarih</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rows" (click)="selectRow(r)" style="cursor:pointer;">
+            <td>{{ r.fromNumber }}</td>
+            <td class="text-truncate" style="max-width: 600px;">{{ r.message }}</td>
+            <td>{{ r.receivedAt | date:'dd.MM.yyyy HH:mm' }}</td>
+          </tr>
+
+          <tr *ngIf="!loading && rows.length === 0">
+            <td colspan="3" class="text-center text-muted">Kayıt bulunamadı.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sayfalama -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div>Toplam: <strong>{{ total }}</strong></div>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-light" (click)="onPage(-1)" [disabled]="page <= 1 || loading">Önceki</button>
+        <button class="btn btn-sm btn-light" (click)="onPage(1)" [disabled]="(page * pageSize) >= total || loading">Sonraki</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detay Kartı -->
+<div class="card mt-5" *ngIf="selected">
+  <div class="card-header">
+    <div class="card-title">Mesaj Detayı</div>
+  </div>
+  <div class="card-body">
+    <div class="mb-2"><strong>Gönderen: </strong>{{ selected.fromNumber }}</div>
+    <div class="mb-2"><strong>Tarih: </strong>{{ selected.receivedAt | date:'dd.MM.yyyy HH:mm' }}</div>
+    <div class="mb-2"><strong>Mesaj:</strong></div>
+    <pre class="mb-0">{{ selected.message }}</pre>
+  </div>
+</div>

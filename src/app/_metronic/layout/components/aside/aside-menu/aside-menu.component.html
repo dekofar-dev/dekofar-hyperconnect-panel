@@ -254,7 +254,7 @@
 </div>
 
 <!-- Müşteri Hizmetleri -->
-<div class="menu-item menu-accordion disabled" data-kt-menu-trigger="click">
+<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
   <span class="menu-link">
     <span class="menu-icon">
       <span [inlineSVG]="'./assets/media/icons/duotune/communication/com012.svg'" class="svg-icon svg-icon-2"></span>
@@ -263,9 +263,19 @@
     <span class="menu-arrow"></span>
   </span>
   <div class="menu-sub menu-sub-accordion">
-    <div class="menu-item"><a class="menu-link" routerLink="/support/pending-support" routerLinkActive="active"><span class="menu-title">Destek Bekleyenler</span></a></div>
-    <div class="menu-item"><a class="menu-link" routerLink="/support/undelivered" routerLinkActive="active"><span class="menu-title">Teslim Edilemeyenler</span></a></div>
-    <div class="menu-item"><a class="menu-link" routerLink="/support/return-requests" routerLinkActive="active"><span class="menu-title">İade Talepleri</span></a></div>
+    <div class="menu-item disabled"><a class="menu-link" routerLink="/support/pending-support" routerLinkActive="active"><span class="menu-title">Destek Bekleyenler</span></a></div>
+    <div class="menu-item disabled"><a class="menu-link" routerLink="/support/undelivered" routerLinkActive="active"><span class="menu-title">Teslim Edilemeyenler</span></a></div>
+    <div class="menu-item disabled"><a class="menu-link" routerLink="/support/return-requests" routerLinkActive="active"><span class="menu-title">İade Talepleri</span></a></div>
+    <!-- YENİ: SMS Gelen Kutusu -->
+<!-- YENİ: SMS Gelen Kutusu -->
+<div class="menu-item">
+<a class="menu-link" routerLink="/support/sms-inbox" routerLinkActive="active">
+  <span class="menu-title">SMS Gelen Kutusu</span>
+</a>
+
+</div>
+
+
   </div>
 </div>
 
