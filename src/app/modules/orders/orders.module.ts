@@ -7,12 +7,14 @@ import { OrderListComponent } from './components/order-list/order-list.component
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 import { ManualOrderCreateComponent } from './components/manual-order-create/manual-order-create.component'; // ✅ varsa
 import { OrdersRoutingModule } from './orders-routing.module';
+import { OrderItemsSummaryComponent } from './components/order-items-summary/order-items-summary.component';
 
 @NgModule({
   declarations: [
     OrderListComponent,
     OrderDetailComponent,
-    ManualOrderCreateComponent // ✅ varsa ekle
+    ManualOrderCreateComponent,
+    OrderItemsSummaryComponent
   ],
   imports: [
     CommonModule,

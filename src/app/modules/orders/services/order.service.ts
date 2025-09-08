@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable, forkJoin, map, switchMap, of } from 'rxjs';
 import { OrderModel } from '../models/order.model';
+import { OrderItemSummary } from '../models/order-item-summary.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
@@ -11,9 +12,7 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Shopify ve manuel siparişleri birleştirip tarih sırasına göre döner (sayfalı Shopify).
-   */
+  /** Shopify ve manuel siparişleri birleştirip tarih sırasına göre döner (sayfalı Shopify). */
   getCombinedOrders(
     limit: number,
     pageInfo?: string,
@@ -50,30 +49,22 @@ export class OrderService {
     );
   }
 
-  /**
-   * (Opsiyonel) Front-end’de detay toplama: arama → ID listesi → tekil detail çağrıları.
-   * Büyük listelerde rate-limit ihtimali olduğundan max (default 50) ile sınırlar.
-   */
+  /** (Opsiyonel) Front-end’de detay toplama: arama → ID listesi → tekil detail çağrıları. */
   searchOrdersDetailedFrontOnly(query: string, max = 50): Observable<OrderModel[]> {
     const url = `${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`;
-
     return this.http.get<any[]>(url).pipe(
-      map(list => (list || []).map((o: any) => o.id)),                 // 1) id’leri al
-      map(ids => Array.from(new Set(ids)).slice(0, max)),              // 2) tekilleştir + sınırla
+      map(list => (list || []).map((o: any) => o.id)),
+      map(ids => Array.from(new Set(ids)).slice(0, max)),
       switchMap(ids => {
         if (!ids.length) return of<OrderModel[]>([]);
-        const calls = ids.map((id: any) => this.getShopifyOrderById(String(id))); // 3) detail çağrıları
+        const calls = ids.map((id: any) => this.getShopifyOrderById(String(id)));
         return forkJoin(calls);
       }),
-      map(items =>
-        items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      )
+      map(items => items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()))
     );
   }
 
-  /**
-   * Manuel + Shopify araması (genel).
-   */
+  /** Manuel + Shopify araması (genel). */
   searchOrders(query: string): Observable<OrderModel[]> {
     const manual$ = this.http
       .get<any[]>(`${this.apiUrl}/manual-orders/search?query=${encodeURIComponent(query)}`)
@@ -92,9 +83,7 @@ export class OrderService {
     );
   }
 
-  /**
-   * (Kısayol) Sadece Shopify araması — Excel/export senaryoları için idealdir.
-   */
+  /** (Kısayol) Sadece Shopify araması — Excel/export senaryoları için idealdir. */
   searchOrdersShopifyOnly(query: string): Observable<OrderModel[]> {
     return this.http
       .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
@@ -104,9 +93,14 @@ export class OrderService {
       );
   }
 
-  /**
-   * Tüm siparişleri al (sayfalama yok).
-   */
+  /** (Opsiyonel) Hafif liste: backend’in /orders/search-lite’i */
+  searchOrdersLite(query: string): Observable<OrderModel[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/Shopify/orders/search-lite?query=${encodeURIComponent(query)}`)
+      .pipe(map(results => (results || []).map(order => this.mapShopifyOrder(order))));
+  }
+
+  /** Tüm siparişleri al (sayfalama yok). */
   getAllOrders(): Observable<OrderModel[]> {
     return forkJoin([this.getManualOrders(), this.getShopifyOrders()]).pipe(
       map(([manualOrders, shopifyOrders]) =>
@@ -136,9 +130,7 @@ export class OrderService {
     );
   }
 
-  /**
-   * DÜZELTİLDİ: Tekil Shopify sipariş endpoint’i → /api/Shopify/orders/{id}
-   */
+  /** DÜZELTİLDİ: Tekil Shopify sipariş endpoint’i → /api/Shopify/orders/{id} */
   getShopifyOrderById(id: string): Observable<OrderModel> {
     return this.http.get<any>(`${this.apiUrl}/Shopify/orders/${id}`).pipe(
       map(data => this.mapShopifyOrder(data))
@@ -171,9 +163,85 @@ export class OrderService {
     return this.http.post<string>(`${this.apiUrl}/manual-orders`, order);
   }
 
-  /**
-   * Manuel siparişi OrderModel’e mapler.
-   */
+  /** DHL etiketli açık & unfulfilled siparişler */
+  getDhlOpenUnshipped(): Observable<OrderModel[]> {
+    const q = 'tag:DHL AND status:open AND fulfillment_status:unfulfilled';
+    return this.searchOrdersShopifyOnly(q);
+  }
+
+  /** Sadece isim + telefon için hafif sorgu (Shopify-only) */
+  searchOrderContactsShopifyOnly(query: string): Observable<{ name: string; phone: string }[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
+      .pipe(
+        map(results => (results || []).map(order => {
+          const name = `${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim();
+          const phone = order.phone || order.customer?.phone || order.shipping_address?.phone || '';
+          return { name, phone };
+        })),
+        map(list =>
+          list
+            .map(x => ({
+              name: (x.name ?? '').trim(),
+              phone: (x.phone ?? '').toString().trim()
+            }))
+            .filter(x => x.name && x.phone)
+        )
+      );
+  }
+
+  /** Shopify ürün bazlı özet (varsayılan son 30 gün) */
+  getShopifyOrderItemsSummary(params?: {
+    days?: number;
+    statusCsv?: string;        // "open"
+    financialCsv?: string;     // "pending,authorized,paid,partially_paid,partially_refunded"
+    fulfillmentCsv?: string;   // "unfulfilled,partial"
+  }): Observable<OrderItemSummary[]> {
+    const q = new URLSearchParams();
+    q.set('days', String(params?.days ?? 30));
+    q.set('status', params?.statusCsv ?? 'open');
+    q.set('financial', params?.financialCsv ?? 'pending,authorized,paid,partially_paid,partially_refunded');
+    q.set('fulfillment', params?.fulfillmentCsv ?? 'unfulfilled,partial');
+    return this.http.get<OrderItemSummary[]>(`${this.apiUrl}/Shopify/order-items/summary?${q.toString()}`);
+  }
+
+  /** 🔹 Yeni: tarih aralığı verip özet alma (backend: /order-items/summary-by-range) */
+  getShopifyOrderItemsSummaryByRange(opts: {
+    start: Date | string;
+    end: Date | string;
+    statusCsv?: string;
+    financialCsv?: string;
+    fulfillmentCsv?: string;
+  }): Observable<OrderItemSummary[]> {
+    const q = new URLSearchParams();
+    q.set('start', typeof opts.start === 'string' ? opts.start : opts.start.toISOString());
+    q.set('end',   typeof opts.end   === 'string' ? opts.end   : opts.end.toISOString());
+    q.set('status',      opts.statusCsv     ?? 'open');
+    q.set('financial',   opts.financialCsv  ?? 'pending,authorized,paid,partially_paid,partially_refunded');
+    q.set('fulfillment', opts.fulfillmentCsv?? 'unfulfilled,partial');
+    return this.http.get<OrderItemSummary[]>(`${this.apiUrl}/Shopify/order-items/summary-by-range?${q.toString()}`);
+  }
+
+  /** 🔹 Yeni: server-side cache temizle (tüm ilgili bellek cache’leri) */
+  clearShopifyCaches(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/Shopify/orders/clear-cache`, {});
+  }
+
+  /** 🔹 Yeni: cursor bazlı açık siparişler (ilk sayfa için pageInfo vermeyin) */
+  getOpenOrdersWithCursor(limit = 20, pageInfo?: string): Observable<{ items: OrderModel[]; nextPageInfo?: string }> {
+    const q = new URLSearchParams();
+    q.set('limit', String(limit));
+    if (pageInfo) q.set('pageInfo', pageInfo);
+    return this.http
+      .get<{ items: any[]; nextPageInfo?: string }>(`${this.apiUrl}/Shopify/orders-open-cursor?${q.toString()}`)
+      .pipe(map(res => ({
+        items: (res.items || []).map(o => this.mapShopifyOrder(o)),
+        nextPageInfo: res.nextPageInfo
+      })));
+  }
+
+  // ------------ Mappers & yardımcılar ------------
+
   private mapManualOrder(order: any): OrderModel {
     return {
       id: String(order.id),
@@ -209,161 +277,102 @@ export class OrderService {
     };
   }
 
-  /**
-   * Shopify siparişini OrderModel’e mapler.
-   * - Adres/İl/İlçe için shipping yoksa billing ve note_attributes fallback’ları.
-   * - TR düzeni: province → İL, city → İLÇE (ama notlar öncelikli).
-   */
-private mapShopifyOrder(order: any): OrderModel {
-  const financial = (order.financial_status || '').toLowerCase();
-  const fulfillment = (order.fulfillment_status || '').toLowerCase();
+  private mapShopifyOrder(order: any): OrderModel {
+    const financial = (order.financial_status || '').toLowerCase();
+    const fulfillment = (order.fulfillment_status || '').toLowerCase();
 
-  let status: string;
-  if (financial === 'paid' && fulfillment === 'fulfilled') status = 'Tamamlandı';
-  else if (financial === 'paid' && fulfillment === 'unfulfilled') status = 'Hazırlanıyor';
-  else if (financial === 'refunded') status = 'İade Edildi';
-  else if (financial === 'partially_refunded') status = 'Kısmi İade';
-  else if (financial === 'pending') status = 'Beklemede';
-  else if (financial === 'authorized') status = 'Onaylandı';
-  else if (financial === 'voided') status = 'İptal';
-  else status = 'Bilinmiyor';
+    let status: string;
+    if (financial === 'paid' && fulfillment === 'fulfilled') status = 'Tamamlandı';
+    else if (financial === 'paid' && fulfillment === 'unfulfilled') status = 'Hazırlanıyor';
+    else if (financial === 'refunded') status = 'İade Edildi';
+    else if (financial === 'partially_refunded') status = 'Kısmi İade';
+    else if (financial === 'pending') status = 'Beklemede';
+    else if (financial === 'authorized') status = 'Onaylandı';
+    else if (financial === 'voided') status = 'İptal';
+    else status = 'Bilinmiyor';
 
-  // Adres: shipping varsa onu, yoksa billing
-  const addr = order.shipping_address ?? order.billing_address ?? {};
-  const address = [addr.address1, addr.address2].filter(Boolean).join(' ').trim();
+    const addr = order.shipping_address ?? order.billing_address ?? {};
+    const address = [addr.address1, addr.address2].filter(Boolean).join(' ').trim();
 
-  // Notlardan Şehir/İlçe okunabiliyorsa onları tercih et
-  const noteIl   = this.getNoteAttr(order, ['şehir', 'sehir', 'il']);
-  const noteIlce = this.getNoteAttr(order, ['ilçe', 'ilce']);
+    const noteIl   = this.getNoteAttr(order, ['şehir', 'sehir', 'il']);
+    const noteIlce = this.getNoteAttr(order, ['ilçe', 'ilce']);
 
-  // Shopify alanları: TR için çoğu mağazada city=İL, province=İLÇE kullanılıyor
-  // Elindeki örnekte de (Ankara / Polatlı) bu şekilde.
-  const city    = (noteIl   ?? addr.city     ?? '').toString().trim();     // İL
-  const district= (noteIlce ?? addr.province ?? '').toString().trim();     // İLÇE
+    const city     = (noteIl   ?? addr.city     ?? '').toString().trim();   // İL
+    const district = (noteIlce ?? addr.province ?? '').toString().trim();   // İLÇE
 
-  // Telefonu en iyi kaynaktan çek ve normalize et (10 hane, 0'sız)
-  const phone = this.pickBestPhone(order);
+    const phone = this.pickBestPhone(order);
+    const email = order.email || order.contact_email || order.customer?.email || '';
 
-  const email = order.email || order.contact_email || order.customer?.email || '';
+    return {
+      id: order.id?.toString() ?? '',
+      orderNumber: order.order_number ?? order.name ?? order.id?.toString(),
+      source: 'Shopify',
+      createdAt: order.created_at,
+      status,
 
-  return {
-    id: order.id?.toString() ?? '',
-    orderNumber: order.order_number ?? order.name ?? order.id?.toString(),
-    source: 'Shopify',
-    createdAt: order.created_at,
-    status,
+      customerName: `${order.customer?.first_name ?? addr.first_name ?? ''} ${order.customer?.last_name ?? addr.last_name ?? ''}`
+        .trim() || 'Shopify Müşterisi',
+      phone,
+      email,
 
-    customerName: `${order.customer?.first_name ?? addr.first_name ?? ''} ${order.customer?.last_name ?? addr.last_name ?? ''}`
-      .trim() || 'Shopify Müşterisi',
-    phone,
-    email,
+      address,
+      city,
+      district,
 
-    address,
-    city,       // İL
-    district,   // İLÇE
+      paymentType: 'Kredi Kartı',
+      orderNote: order.note,
+      totalAmount: parseFloat(order.total_price ?? '0') || 0,
+      currency: order.currency ?? 'TRY',
+      createdByAvatarUrl: undefined,
 
-    paymentType: 'Kredi Kartı',
-    orderNote: order.note,
-    totalAmount: parseFloat(order.total_price ?? '0') || 0,
-    currency: order.currency ?? 'TRY',
-    createdByAvatarUrl: undefined,
-
-    items: (order.line_items ?? []).map((item: any) => ({
-      productId: String(item.product_id ?? ''),
-      productName: item.title ?? item.name,
-      quantity: item.quantity,
-      price: parseFloat(item.price ?? '0') || 0,
-      variantId: String(item.variant_id ?? ''),
-      variantName: item.variant_title
-    }))
-  };
-}
-/** note_attributes içinden anahtar adına göre değer çek */
-private getNoteAttr(order: any, keys: string[]): string | undefined {
-  const list: any[] = order?.note_attributes ?? [];
-  const hit = list.find(x => {
-    const n = String(x?.name ?? '').toLowerCase();
-    return keys.some(k => n.includes(k.toLowerCase()));
-  });
-  const val = hit?.value;
-  return (val === undefined || val === null) ? undefined : String(val);
-}
-
-/** TR telefon: 10 hane, başında 0 yok (örn: 5364621515) */
-private normalizePhone10TR(raw: any): string {
-  let s = String(raw ?? '').replace(/\D/g, '');
-  if (!s) return '';
-  // +90 / 90 öneklerini kırp
-  if (s.startsWith('90') && s.length >= 12) s = s.slice(2);
-  // 0 ile başlıyorsa ve 11+ hane ise ilk 0'ı kırp (0536... -> 536...)
-  if (s.startsWith('0') && s.length >= 11) s = s.slice(1);
-  // son 10 haneyi al
-  return s.length >= 10 ? s.slice(-10) : s;
-}
-
-/** Adaylar içinden en iyi telefonu seç (öncelik: 10 hane ve 5 ile başlayan GSM) */
-private pickBestPhone(order: any): string {
-  const fromNotes = this.getNoteAttr(order, ['telefon', 'telefon numarası', 'phone']);
-
-  const candidates = [
-    order?.shipping_address?.phone,
-    order?.billing_address?.phone,
-    order?.customer?.phone,
-    fromNotes
-  ].filter(Boolean) as string[];
-
-  const norm = candidates
-    .map(c => this.normalizePhone10TR(c))
-    .filter(x => !!x);
-
-  // 10 haneli ve 5 ile başlayan varsa onu al
-  const gsm = norm.find(x => x.length === 10 && x.startsWith('5'));
-  if (gsm) return gsm;
-
-  // 10 haneli ilkini al
-  const ten = norm.find(x => x.length === 10);
-  if (ten) return ten;
-
-  // elde ne varsa en uzunu al (fallback)
-  return norm.sort((a, b) => b.length - a.length)[0] ?? '';
-}
-
-
-  /**
-   * DHL etiketli açık & unfulfilled siparişler (Shopify-only arama kısayolu ile).
-   */
-  getDhlOpenUnshipped(): Observable<OrderModel[]> {
-    const q = 'tag:DHL AND status:open AND fulfillment_status:unfulfilled';
-    return this.searchOrdersShopifyOnly(q);
+      items: (order.line_items ?? []).map((item: any) => ({
+        productId: String(item.product_id ?? ''),
+        productName: item.title ?? item.name,
+        quantity: item.quantity,
+        price: parseFloat(item.price ?? '0') || 0,
+        variantId: String(item.variant_id ?? ''),
+        variantName: item.variant_title
+      }))
+    };
   }
 
+  private getNoteAttr(order: any, keys: string[]): string | undefined {
+    const list: any[] = order?.note_attributes ?? [];
+    const hit = list.find(x => {
+      const n = String(x?.name ?? '').toLowerCase();
+      return keys.some(k => n.includes(k.toLowerCase()));
+    });
+    const val = hit?.value;
+    return (val === undefined || val === null) ? undefined : String(val);
+  }
 
-  /** Sadece isim + telefon için hafif sorgu (Shopify-only) */
-searchOrderContactsShopifyOnly(query: string): Observable<{ name: string; phone: string }[]> {
-  return this.http
-    .get<any[]>(`${this.apiUrl}/Shopify/orders/search?query=${encodeURIComponent(query)}`)
-    .pipe(
-      map(results => (results || []).map(order => {
-        const name = `${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim();
-        const phone = order.phone || order.customer?.phone || order.shipping_address?.phone || '';
-        return { name, phone };
-      })),
-      map(list =>
-        list
-          .map(x => ({
-            name: (x.name ?? '').trim(),
-            phone: (x.phone ?? '').toString().trim()
-          }))
-          .filter(x => x.name && x.phone) // boş olanları at
-      )
-    );
-}
-/** DHL → Shopify senkron job’unu manuel tetikler */
-// syncNowDhlShopify(): Observable<{ message: string }> {
-//   return this.http.post<{ message: string }>(`${this.apiUrl}/DhlKargo/sync-now`, {});
-// }
-syncNowDhlShopify(): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/DhlKargo/sync-last7days`, {});
-}
+  private normalizePhone10TR(raw: any): string {
+    let s = String(raw ?? '').replace(/\D/g, '');
+    if (!s) return '';
+    if (s.startsWith('90') && s.length >= 12) s = s.slice(2);
+    if (s.startsWith('0') && s.length >= 11) s = s.slice(1);
+    return s.length >= 10 ? s.slice(-10) : s;
+  }
 
+  private pickBestPhone(order: any): string {
+    const fromNotes = this.getNoteAttr(order, ['telefon', 'telefon numarası', 'phone']);
+    const candidates = [
+      order?.shipping_address?.phone,
+      order?.billing_address?.phone,
+      order?.customer?.phone,
+      fromNotes
+    ].filter(Boolean) as string[];
+
+    const norm = candidates.map(c => this.normalizePhone10TR(c)).filter(x => !!x);
+    const gsm = norm.find(x => x.length === 10 && x.startsWith('5'));
+    if (gsm) return gsm;
+    const ten = norm.find(x => x.length === 10);
+    if (ten) return ten;
+    return norm.sort((a, b) => b.length - a.length)[0] ?? '';
+  }
+
+  /** DHL → Shopify senkron job’unu manuel tetikler */
+  syncNowDhlShopify(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/DhlKargo/sync-last7days`, {});
+  }
 }
