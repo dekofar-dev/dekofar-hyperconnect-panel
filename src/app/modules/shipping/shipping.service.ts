@@ -121,27 +121,28 @@ export interface ShipmentDetail {
   providedIn: 'root'
 })
 export class ShippingService {
-  private apiUrl = `${environment.apiUrl}/dhlkargo`;
+  private apiUrl = `${environment.apiUrl}/kargo/dhl/standardquery`;
 
   constructor(private http: HttpClient) {}
 
   /** Tek bir shipmentId için son durumu getirir */
   getShipmentStatus(shipmentId: string): Observable<ShipmentStatus> {
-    return this.http.get<ShipmentStatus>(`${this.apiUrl}/shipment-status/${shipmentId}`);
-  }
-
-  /** Tek bir shipmentId için tüm status geçmişini getirir */
-  getShipmentStatusList(shipmentId: string): Observable<ShipmentStatus[]> {
-    return this.http.get<ShipmentStatus[]>(`${this.apiUrl}/shipment-status-list/${shipmentId}`);
+    return this.http.get<ShipmentStatus>(
+      `${this.apiUrl}/shipment-status/by-shipmentid/${shipmentId}`
+    );
   }
 
   /** Tek bir shipmentId için hareket geçmişini (track) getirir */
   trackShipment(shipmentId: string): Observable<ShipmentTrack[]> {
-    return this.http.get<ShipmentTrack[]>(`${this.apiUrl}/track-shipment/${shipmentId}`);
+    return this.http.get<ShipmentTrack[]>(
+      `${this.apiUrl}/track/by-shipmentid/${shipmentId}`
+    );
   }
 
   /** Tek bir shipmentId için detaylı gönderi bilgisini getirir */
-  getShipmentDetail(shipmentId: string): Observable<ShipmentDetail> {
-    return this.http.get<ShipmentDetail>(`${this.apiUrl}/shipment/${shipmentId}`);
+  getShipmentDetail(shipmentId: string): Observable<ShipmentDetail[]> {
+    return this.http.get<ShipmentDetail[]>(
+      `${this.apiUrl}/shipment/by-shipmentid/${shipmentId}`
+    );
   }
 }
