@@ -78,6 +78,12 @@ const Routing: Routes = [
     loadChildren: () =>
       import('../modules/orders/orders.module').then((m) => m.OrdersModule),
   },
+  {
+  path: 'media-downloader',
+  loadChildren: () =>
+    import('../modules/media-downloader/media-downloader.module')
+      .then(m => m.MediaDownloaderModule)
+},
     {
     path: 'excel-tools',
     loadChildren: () =>

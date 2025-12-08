@@ -1,0 +1,53 @@
+.media-downloader {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .5rem;
+}
+
+textarea {
+  width: 100%;
+  margin: .5rem 0 1rem;
+  font-family: monospace;
+}
+
+button {
+  padding: .4rem .8rem;
+  margin-right: .4rem;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: .5rem;
+}
+
+th, td {
+  border-bottom: 1px solid #eee;
+  padding: .4rem .6rem;
+  vertical-align: middle;
+}
+
+.error {
+  margin-top: .5rem;
+  color: #b00020;
+}
+
+.download-actions {
+  margin-top: 1rem;
+}

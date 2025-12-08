@@ -1,0 +1,131 @@
+<div class="media-downloader">
+
+  <h2>Media Downloader</h2>
+
+  <!-- URL Girişi -->
+  <div class="card">
+    <label for="urls">Ürün linkleri (her satır 1 URL):</label>
+    <textarea
+      id="urls"
+      [(ngModel)]="urlsText"
+      rows="6"
+      placeholder="https://site.com/urun/1
+https://site.com/urun/2"></textarea>
+
+    <button (click)="onPreview()" [disabled]="isLoadingPreview">
+      {{ isLoadingPreview ? 'Yükleniyor...' : 'Önizle' }}
+    </button>
+  </div>
+
+  <!-- Hata mesajı -->
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Önizleme Alanı -->
+  <div class="preview" *ngIf="hasPreview">
+
+    <!-- Resimler -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Resimler ({{ imageItems.length }})</h3>
+        <div class="actions">
+          <button (click)="selectAllImages()">Tümünü seç</button>
+          <button (click)="clearAllImages()">Seçimleri temizle</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Önizleme</th>
+            <th>Sayfa</th>
+            <th>Format</th>
+            <th>Önerilen</th>
+            <th>Boyut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of imageItems">
+            <td>
+              <input
+                type="checkbox"
+                [checked]="selectedImageIds.has(item.id)"
+                (change)="toggleImageSelection(item.id, $any($event.target).checked)"
+              />
+            </td>
+            <td>
+              <img [src]="item.mediaUrl" alt="" width="80" />
+            </td>
+            <td>
+              <a [href]="item.pageUrl" target="_blank">
+                {{ item.pageUrl | slice: 0:50
+                }}<span *ngIf="item.pageUrl.length > 50">...</span>
+              </a>
+            </td>
+            <td>{{ item.originalFormat || '-' }}</td>
+            <td>{{ item.suggestedFormat || '-' }}</td>
+            <td>{{ formatSize(item.sizeBytes) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Videolar -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Videolar ({{ videoItems.length }})</h3>
+        <div class="actions">
+          <button (click)="selectAllVideos()">Tümünü seç</button>
+          <button (click)="clearAllVideos()">Seçimleri temizle</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Önizleme</th>
+            <th>Sayfa</th>
+            <th>Format</th>
+            <th>Önerilen</th>
+            <th>Boyut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of videoItems">
+            <td>
+              <input
+                type="checkbox"
+                [checked]="selectedVideoIds.has(item.id)"
+                (change)="toggleVideoSelection(item.id, $any($event.target).checked)"
+              />
+            </td>
+            <td>
+              <video [src]="item.mediaUrl" width="120" controls muted></video>
+            </td>
+            <td>
+              <a [href]="item.pageUrl" target="_blank">
+                {{ item.pageUrl | slice: 0:50
+                }}<span *ngIf="item.pageUrl.length > 50">...</span>
+              </a>
+            </td>
+            <td>{{ item.originalFormat || '-' }}</td>
+            <td>{{ item.suggestedFormat || '-' }}</td>
+            <td>{{ formatSize(item.sizeBytes) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Download butonu -->
+    <div class="download-actions">
+      <button (click)="onDownload()" [disabled]="isDownloading">
+        {{ isDownloading ? 'İndiriliyor...' : 'Seçilenleri indir (2 ZIP)' }}
+      </button>
+    </div>
+
+  </div>
+
+</div>
