@@ -198,7 +198,7 @@ export class OrderService {
     fulfillmentCsv?: string;   // "unfulfilled,partial"
   }): Observable<OrderItemSummary[]> {
     const q = new URLSearchParams();
-    q.set('days', String(params?.days ?? 30));
+    q.set('days', String(params?.days ?? 7));
     q.set('status', params?.statusCsv ?? 'open');
     q.set('financial', params?.financialCsv ?? 'pending,authorized,paid,partially_paid,partially_refunded');
     q.set('fulfillment', params?.fulfillmentCsv ?? 'unfulfilled,partial');

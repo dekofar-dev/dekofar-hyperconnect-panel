@@ -22,11 +22,11 @@ export class OrderItemsSummaryComponent implements OnInit {
   constructor(private orders: OrderService) {}
 
   ngOnInit(): void {
-    this.load(30); // varsayılan 30 gün
+    this.load(7); // varsayılan 30 gün
   }
 
   /** API'den özeti çek ve ürün bazında grupla */
-  load(days = 30): void {
+  load(days = 7): void {
     this.loading = true;
 
     // OrderService.getShopifyOrderItemsSummary default filtreleri:
