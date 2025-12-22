@@ -1,113 +1,100 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderService } from '../../services/order.service';
-import { OrderItemSummary, ProductGroup, VariantRow } from '../../models/order-item-summary.model';
+import { ProductVariantSummary } from '../../models/product-variant-summary.model';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-order-items-summary',
   templateUrl: './order-items-summary.component.html'
 })
 export class OrderItemsSummaryComponent implements OnInit {
-  // ham api verisi
-  items: OrderItemSummary[] = [];
 
-  // ekranda kullanılacak gruplu veri
-  groups: ProductGroup[] = [];
+  // =====================================================
+  // 🔹 DATA
+  // =====================================================
 
-  // sayfanın en altında gösterilecek genel toplam
+  products: ProductVariantSummary[] = [];
   grandTotal = 0;
 
-  // UI durumu
+  // =====================================================
+  // 🔍 SEARCH
+  // =====================================================
+
+  /** Kullanıcının yazdığı değer */
+  tagSearch = new FormControl('');
+
+  /** Backend’e gönderilen AKTİF tag */
+  activeTag?: string;
+
+  // =====================================================
+  // 🔹 UI STATE
+  // =====================================================
+
   loading = false;
 
   constructor(private orders: OrderService) {}
 
+  // =====================================================
+  // 🔹 LIFECYCLE
+  // =====================================================
+
   ngOnInit(): void {
-    this.load(7); // varsayılan 30 gün
+    // İlk yükleme (tagsiz)
+    this.loadProducts();
   }
 
-  /** API'den özeti çek ve ürün bazında grupla */
-  load(days = 7): void {
+  // =====================================================
+  // 🔹 LOAD PRODUCTS
+  // =====================================================
+
+  loadProducts(tag?: string): void {
     this.loading = true;
 
-    // OrderService.getShopifyOrderItemsSummary default filtreleri:
-    // status=open, financial=pending,authorized,paid,partially_paid,partially_refunded, fulfillment=unfulfilled,partial
-    this.orders.getShopifyOrderItemsSummary({ days })
-      .subscribe({
-        next: (res) => {
-          this.items = res ?? [];
-          this.buildGroups();
-          this.loading = false;
-        },
-        error: () => {
-          this.items = [];
-          this.groups = [];
-          this.grandTotal = 0;
-          this.loading = false;
-        }
-      });
-  }
+    this.orders.getProductVariantSummary(tag).subscribe({
+      next: res => {
+        this.products = res ?? [];
 
-  /** Gelen düz listeyi ürün bazında grupla ve varyantları altına topla */
-  private buildGroups(): void {
-    const map = new Map<number, ProductGroup>();
-    let total = 0;
-
-    for (const it of this.items) {
-      total += it.totalQuantity;
-
-      const existing = map.get(it.productId);
-      if (!existing) {
-        map.set(it.productId, {
-          productId: it.productId,
-          title: it.title,
-          imageUrl: it.imageUrl,
-          totalQuantity: it.totalQuantity,
-          variants: [{
-            variantId: it.variantId,
-            variantTitle: it.variantTitle,
-            quantity: it.totalQuantity,
-            imageUrl: it.imageUrl
-          }]
-        });
-      } else {
-        // Ürün toplamı
-        existing.totalQuantity += it.totalQuantity;
-
-        // Varyantı bul ya da ekle (id + title kombinasyonu ile)
-        const idx = existing.variants.findIndex(v =>
-          (v.variantId ?? 0) === (it.variantId ?? 0) &&
-          (v.variantTitle ?? '') === (it.variantTitle ?? '')
+        this.grandTotal = this.products.reduce(
+          (sum, p) => sum + (p.totalQuantity ?? 0),
+          0
         );
-        if (idx >= 0) {
-          existing.variants[idx].quantity += it.totalQuantity;
-        } else {
-          existing.variants.push({
-            variantId: it.variantId,
-            variantTitle: it.variantTitle,
-            quantity: it.totalQuantity,
-            imageUrl: it.imageUrl
-          });
-        }
 
-        // Ürün görseli boşsa ilk bulunanı ata
-        if (!existing.imageUrl && it.imageUrl) {
-          existing.imageUrl = it.imageUrl;
-        }
+        this.loading = false;
+      },
+      error: () => {
+        this.products = [];
+        this.grandTotal = 0;
+        this.loading = false;
       }
-    }
-
-    // Sıralamalar: varyantlar ve ürünler adetine göre azalan
-    const list = Array.from(map.values());
-    for (const g of list) {
-      g.variants.sort((a, b) => b.quantity - a.quantity);
-    }
-    list.sort((a, b) => b.totalQuantity - a.totalQuantity);
-
-    this.groups = list;
-    this.grandTotal = total;
+    });
   }
 
-  /** *ngFor trackBy */
-  trackGroup = (_: number, g: ProductGroup) => g.productId;
-  trackVariant = (_: number, v: VariantRow) => `${v.variantId ?? 0}-${v.variantTitle ?? ''}`;
+  // =====================================================
+  // 🔹 SEARCH ACTIONS
+  // =====================================================
+
+  /** Enter veya Ara butonu */
+  search(): void {
+    const raw = this.tagSearch.value ?? '';
+    const tag = raw.trim();
+
+    this.activeTag = tag || undefined;
+    this.loadProducts(this.activeTag);
+  }
+
+  clearSearch(): void {
+    this.tagSearch.setValue('');
+    this.activeTag = undefined;
+    this.loadProducts();
+  }
+
+  // =====================================================
+  // 🔹 TRACK BY
+  // =====================================================
+
+  trackProduct = (_: number, p: ProductVariantSummary) =>
+    p.productTitle;
+
+  trackVariant = (_: number, v: any) =>
+    `${v.variantTitle ?? 'standart'}-${v.quantity}`;
 }

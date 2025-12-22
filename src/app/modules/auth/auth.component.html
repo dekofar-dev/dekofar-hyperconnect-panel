@@ -27,9 +27,7 @@
       <!--begin::Links-->
       <!-- <div class="d-flex fw-semibold text-primary fs-base">
         <a href="#" class="px-5" target="_blank">Terms</a>
-
         <a href="#" class="px-5" target="_blank">Plans</a>
-
         <a href="#" class="px-5" target="_blank">Contact Us</a>
       </div> -->
       <!--end::Links-->
@@ -39,10 +37,22 @@
   <!--end::Body-->
 
   <!--begin::Aside-->
-  <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2"
-    [ngStyle]="{'background-image': 'url(./assets/media/misc/auth-bg.png)'}">
+  <div
+    class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2 position-relative overflow-hidden">
+
+    <!-- 🎥 BACKGROUND VIDEO -->
+    <video
+      #bgVideo
+      class="auth-bg-video"
+      muted
+      loop
+      autoplay
+      playsinline
+      preload="auto">
+    </video>
+
     <!--begin::Content-->
-    <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">
+    <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100 position-relative">
       <!--begin::Logo-->
       <a routerLink="/" class="mb-12">
         <!-- <img alt="Logo" src="./assets/media/logos/custom-1.png" class="h-75px" /> -->
@@ -63,15 +73,14 @@
       <!--begin::Text-->
       <!-- <div class="text-white fs-base text-center">
         In this kind of post, <a href="#" class="opacity-75-hover text-warning fw-bold me-1">the blogger</a>
-
         introduces a person they’ve interviewed <br /> and provides some background information about
-
         <a href="#" class="opacity-75-hover text-warning fw-bold me-1">the interviewee</a>
         and their <br /> work following this is a transcript of the interview.
       </div> -->
       <!--end::Text-->
     </div>
     <!--end::Content-->
+
   </div>
   <!--end::Aside-->
 </div>

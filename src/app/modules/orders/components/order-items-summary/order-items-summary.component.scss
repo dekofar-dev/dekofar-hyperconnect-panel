@@ -1,0 +1,18 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.days-filter button {
+  margin-right: 6px;
+}
+
+.days-filter .active {
+  font-weight: bold;
+}
+
+.tag-filter {
+  display: flex;
+  gap: 6px;
+}

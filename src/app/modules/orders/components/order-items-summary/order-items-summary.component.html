@@ -1,73 +1,127 @@
 <div class="card">
-  <div class="card-header align-items-center">
-    <h3 class="card-title">Sipariş Listesi (Gönderilmemiş / Kısmen Gönderilmiş – Ürün Bazlı)</h3>
+
+  <!-- ===================================================== -->
+  <!-- 🔹 HEADER -->
+  <!-- ===================================================== -->
+  <div class="card-header align-items-center justify-content-between">
+
+    <h3 class="card-title">
+      Sipariş Listesi (Gönderilmemiş / Kısmen Gönderilmiş – Ürün Bazlı)
+    </h3>
 
     <div class="card-toolbar">
-      <div class="d-flex gap-2 align-items-center">
-        <span class="me-2 text-muted fs-7">Tarih:</span>
-        <span class="badge badge-light">Son 7 Gün</span>
+      <div class="d-flex gap-3 align-items-center flex-wrap">
 
+        <!-- ================= SEARCH ================= -->
+        <div class="position-relative">
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Etiket ile ara (DHL, KARGO, VIP...)"
+            [formControl]="tagSearch"
+            (keyup.enter)="search()"
+            style="min-width:220px;"
+          />
+
+          <button
+            *ngIf="tagSearch.value"
+            class="btn btn-sm btn-icon btn-light position-absolute top-50 end-0 translate-middle-y me-2"
+            (click)="clearSearch()">
+            ✕
+          </button>
+        </div>
+
+        <!-- ================= SEARCH BUTTON ================= -->
         <button
-          class="btn btn-sm btn-light ms-2"
-          (click)="load(7)"
+          class="btn btn-sm btn-primary"
+          (click)="search()"
+          [disabled]="loading">
+          Ara
+        </button>
+
+        <!-- ================= REFRESH ================= -->
+        <button
+          class="btn btn-sm btn-light"
+          (click)="loadProducts(activeTag)"
           [disabled]="loading">
           Yenile
         </button>
+
       </div>
     </div>
   </div>
 
+  <!-- ===================================================== -->
+  <!-- 🔹 BODY -->
+  <!-- ===================================================== -->
   <div class="card-body">
-    <!-- Loading -->
-    <div *ngIf="loading" class="text-muted">Yükleniyor…</div>
 
-    <!-- Boş durum -->
-    <div *ngIf="!loading && (groups?.length ?? 0) === 0" class="text-muted">
+    <div *ngIf="loading" class="text-muted">
+      Yükleniyor…
+    </div>
+
+    <div *ngIf="!loading && products.length === 0" class="text-muted">
       Kayıt bulunamadı.
     </div>
 
-    <!-- Ürün kartları -->
-    <div *ngIf="!loading && (groups?.length ?? 0) > 0" class="row g-6">
-      <div class="col-12 col-md-6 col-xl-4" *ngFor="let g of groups; trackBy: trackGroup">
+    <!-- ================= PRODUCTS ================= -->
+    <div *ngIf="!loading && products.length > 0" class="row g-6">
+
+      <div
+        class="col-12 col-md-6 col-xl-4"
+        *ngFor="let p of products; trackBy: trackProduct">
+
         <div class="card shadow-sm h-100">
           <div class="card-body">
-            <!-- Ürün başlık + resim + toplam -->
+
             <div class="d-flex align-items-center mb-4">
-              <img *ngIf="g.imageUrl" [src]="g.imageUrl" alt=""
-                   style="width:64px;height:64px;object-fit:cover;border-radius:10px;margin-right:12px;">
+              <img
+                *ngIf="p.productImageUrl"
+                [src]="p.productImageUrl"
+                style="width:64px;height:64px;object-fit:cover;border-radius:10px;margin-right:12px;">
+
               <div class="flex-grow-1">
-                <div class="fw-bold">{{ g.title }}</div>
+                <div class="fw-bold">{{ p.productTitle }}</div>
                 <div class="text-muted fs-7">Toplam Adet</div>
               </div>
-              <div class="fs-4 fw-bolder">{{ g.totalQuantity }}</div>
+
+              <div class="fs-4 fw-bolder">
+                {{ p.totalQuantity }}
+              </div>
             </div>
 
-            <!-- Varyant kartçıkları -->
             <div class="row g-3">
-              <div class="col-12" *ngFor="let v of g.variants; trackBy: trackVariant">
-                <div class="border rounded-3 px-3 py-2 d-flex align-items-center justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <img *ngIf="v.imageUrl" [src]="v.imageUrl" alt=""
-                         style="width:36px;height:36px;object-fit:cover;border-radius:8px;margin-right:10px;">
-                    <span class="badge badge-light-dark">
-                      {{ v.variantTitle || 'Standart' }}
-                    </span>
-                  </div>
-                  <div class="fw-semibold">{{ v.quantity }}</div>
+              <div
+                class="col-12"
+                *ngFor="let v of p.variants; trackBy: trackVariant">
+
+                <div class="border rounded-3 px-3 py-2 d-flex justify-content-between">
+                  <span class="badge badge-light-dark">
+                    {{ v.variantTitle || 'Standart' }}
+                  </span>
+                  <span class="fw-semibold">
+                    {{ v.quantity }}
+                  </span>
                 </div>
+
               </div>
             </div>
 
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- Genel Toplam -->
-    <div *ngIf="!loading && (groups?.length ?? 0) > 0" class="mt-6 d-flex justify-content-end">
+    <!-- ================= TOTAL ================= -->
+    <div
+      *ngIf="!loading && products.length > 0"
+      class="mt-6 d-flex justify-content-end">
+
       <div class="border rounded-3 px-4 py-3 bg-light fw-bold">
         Genel Toplam: {{ grandTotal }}
       </div>
     </div>
+
   </div>
 </div>

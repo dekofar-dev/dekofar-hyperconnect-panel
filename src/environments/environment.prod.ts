@@ -9,7 +9,9 @@ export const environment = {
   isMockEnabled: false,
 
   // Canlı API adresi
-    apiUrl: 'https://dekofar-hyperconnect-api-production.up.railway.app/api',
+      apiUrl: 'http://localhost:5036/api',
+
+    // apiUrl: 'https://dekofar-hyperconnect-api-production.up.railway.app/api',
 
   // Siteye özgü bilgiler
   siteName: 'Herdemtaze',
